@@ -1,0 +1,406 @@
+html {
+  height: 100%;
+  width: 100%;
+  background-image: url(Images/poker-table.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.menuBTN {
+  background-color: whitesmoke;
+  border: solid 2px black;
+  color: black;
+  width: 104px;
+  height: 30px;
+  text-align: left;
+  font-size: 16px;
+  cursor: pointer;
+  position: absolute;
+
+  z-index: 5;
+}
+.menuBTN:hover, .contentBTN:hover, .menuBTN.hover{
+  background-color: #aaa;
+}
+.wrapper {
+  position: absolute;
+  background-color: grey;
+  border: solid 2px black;
+  color: white;
+  width: 100px;
+  height: 50px;
+  opacity: 0;
+  z-index: 4;
+  transition: 0.6s;
+}
+.wrapper.show {
+  display: inline-block;
+  opacity: 1;
+  transform: translate(0, 28px);
+  transition: 0.9s;
+}
+.contentBTN {
+  display: block;
+  user-select: none;
+  text-align: center;
+  background-color: grey;
+  border: 2px solid #2222;
+  color: white;
+  width: 100px;
+  height: 25px;
+  z-index: 5;
+}
+
+
+#call, #raise, #fold {
+  text-align: center;
+  font-size: 24px;
+  color: white;
+  border: 2px solid #007700;
+  border-radius: 5px;
+  width: 150px;
+  height: 40px;
+  position: relative;
+  transform: translate(-50%,-50%);
+  left: 85%;
+  display: inline-block;
+  z-index: 2;
+}
+
+#call {
+  position: absolute;
+  background-color: #00aa00;
+  border-color: #005500;
+  top: 75%;
+}
+#call:hover {
+  background-color: #007700;
+  width: 160px;
+  height: 45px;
+}
+
+#raise {
+  position: absolute;
+  background-color: #00aa00;
+  top: 80%;
+}
+#raise:hover {
+  background-color: #009900;
+  width: 160px;
+  height: 45px;
+}
+
+#fold {
+  position: absolute;
+  background-color: #8f0000;
+  border-color: #550000;
+  top: 85%;
+}
+#fold:hover {
+  background-color: #990000;
+  width: 160px;
+  height: 45px;
+}
+
+#fold:active, #call:active, #raise:active {
+  background-color: pink;
+}
+
+.playerChoices {
+  visibility: hidden;
+}
+.playerChoices.active {
+  visibility: visible;
+}
+
+.paused {
+  filter: blur(20px);
+  transition: 0.3s;
+}
+
+.card {
+  width: 100px;
+  height: 150px;
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 5px;
+  position: absolute;
+  transform: translate(-50%,-50%);
+  top: 55%;
+  transition: 0.5s;
+  visibility: hidden;
+  z-index: 1;
+}
+
+#blurer {
+  z-index: 4;
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100%;
+  visibility: hidden;
+}
+#blurer.active {
+  visibility: visible;
+  backdrop-filter: blur(20px);
+}
+
+#comCard1 {
+  left: 34%;
+}
+#comCard2 {
+  left: 42%;
+}
+#comCard3 {
+  left: 50%;
+}
+#comCard4 {
+  left: 58%;
+}
+#comCard5 {
+  left: 66%;
+}
+
+#playerCard1 {
+  left: 46%;
+  top: 85%;
+}
+#playerCard2 {
+  left: 53%;
+  top: 85%;
+}
+
+#black-triangle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  transform: translate(-50%,-50%);
+  left: 90px;
+  top: 23px;
+  z-index: 6;
+  transition: 0.4s;
+  cursor: pointer;
+}
+#black-triangle.rotate90 {
+  rotate: z 90deg;
+  transition: 0.6s;
+  left: 70px;
+}
+
+.rotate90Y {
+  rotate: y 90deg;
+  transform: translateY(-50%);
+  transition: 0.5s;
+}
+
+.active {
+  visibility: visible;
+}
+
+
+/* Chat button styles */
+#chat-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  z-index: 2;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Chat window styles */
+#chat-window {
+  position: fixed;
+  bottom: 20px;
+  left: 80px;
+  width: 300px;
+  height: 400px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  z-index: 3;
+  display: none;
+}
+
+/* Show chat window on hover */
+#chat-window.active {
+  display: block;
+}
+
+/* Chat messages styles */
+#messages {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  height: 80%;
+  overflow-y: auto;
+}
+
+#messages li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+#messages li:last-child {
+  border-bottom: none;
+}
+
+/* Chat form styles */
+#chat-form {
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+#input {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px black solid;
+  border-radius: 5px;
+  background-color: #f2f2f2;
+}
+
+#chat-send {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#chat-send:hover {
+  background-color: #444;
+}
+
+#player2Card1 { top: 82%; left: 22%; rotate: 40deg;}
+
+#player2Card2 { top: 87%; left: 26%; rotate: 37deg;}
+
+#player3Card1 { left: 14%; top: 50%; rotate: 90deg;}
+
+#player3Card2 { left: 14%; top: 60%; rotate: 90deg;}
+
+#player4Card1 { left: 46%; top: 17%; rotate: 180deg; transform: translate(50%, 0%);}
+
+#player4Card2 { left: 53%; top: 17%; rotate: 180deg; transform: translate(50%, -0%);}
+
+#player5Card1 { top: 19%; left: 20%; rotate: 148deg; }
+
+#player5Card2 { top: 14%; left: 24%; rotate: 150deg; }
+
+#player6Card1 { top: 13%; left: 71%; rotate: 216deg;}
+
+#player6Card2 { top: 18%; left: 75%; rotate: 216deg;}
+
+#player7Card1 { left: 82%; top: 50%; rotate: -90deg;}
+
+#player7Card2 { left: 82%; top: 40%; rotate: -90deg;}
+
+#money {
+  top: 10%;
+  left: 80%;
+  position: absolute;
+  font-size: 50px;
+  background: white;
+  border: 2px solid black;
+  z-index: 4;
+}
+#currentBet {
+  top: 20%;
+  left: 80%;
+  position: absolute;
+  font-size: 30px;
+  background: white;
+  border: 2px solid black;
+  z-index: 4;
+}
+#betted {
+  top: 25%;
+  left: 80%;
+  position: absolute;
+  font-size: 30px;
+  background: white;
+  border: 2px solid black;
+  z-index: 4;
+}
+
+#arrow {
+  position: absolute;
+  width: 75px;
+}
+
+.a1 {
+  top: 66%; 
+  left: 48%;
+  rotate: 90deg;
+}
+.a2 {
+  top: 66%; 
+  left: 32%;
+  rotate: 100deg;
+}
+.a3 {
+  top: 55%; 
+  left: 24%;
+  rotate: 180deg;
+}
+.a4 {
+  top: 66%; 
+  left: 32%;
+  rotate: 90deg;
+}
+.a5 {
+  top: 66%; 
+  left: 48%;
+  rotate: 90deg;
+}
+.a6 {
+  top: 66%; 
+  left: 60%;
+  rotate: 90deg;
+}
+.a7 {
+  top: 66%; 
+  left: 72%;
+  rotate: 90deg;
+}
+.a8 {
+  top: 66%; 
+  left: 60%;
+  rotate: 90deg;
+}
+
+#optInBTN {
+  visibility: hidden;
+  left: 50%;
+  top: 20%;
+  transform: translate(-50%, -0%);
+  position: absolute;
+  width: 150px;
+  height: 50px;
+  background: #aaa;
+  z-index: 4;
+}
+#optOutBTN {
+  visibility: hidden;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -0%);
+  position: absolute;
+  width: 150px;
+  height: 50px;
+  background: #aaa;
+  z-index: 4;
+}
+
+#optInBTN.active {
+  visibility: visible;
+}
+#optOutBTN.active {
+  visibility: visible;
+}
