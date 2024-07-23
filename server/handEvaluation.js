@@ -6,54 +6,49 @@ function highCard(hand) {
 
 function _pair(hand) {
   const pairs = [];
-  let hasPair = false;
   for (const card of hand) {
     const existingPair = pairs.find((pair) => pair.v === card.v);
     if (existingPair) {
       existingPair.count++;
-      hasPair = true;
     } else {
       pairs.push({ v: card.v, count: 1 });
     }
   }
-  return [
-    hasPair,
-    pairs.filter((pair) => pair.count === 2),
-    pairs.filter((pair) => pair.count === 2).length,
-  ];
+  const hasPair = pairs.filter((pair) => pair.count === 2)
+  return [hasPair.length > 0,hasPair,hasPair.length];
 }
 
 function _3ofAKind(hand) {
   const threes = [];
-  let hasThree = false;
   for (const card of hand) {
     const existingThree = threes.find((three) => three.v === card.v);
     if (existingThree) {
       existingThree.count++;
-      if (existingThree.count === 3) {
-        hasThree = true;
-      }
     } else {
       threes.push({ v: card.v, count: 1 });
     }
   }
+  const hasThree = threes.filter((three) => three.count === 3);
   return [
+    hasThree.length > 0,
     hasThree,
-    threes.filter((three) => three.count === 3),
-    threes.filter((three) => three.count === 3).length,
+    hasThree.length,
   ];
 }
 
 function _straight(hand) {
-  for (let i = 5; i < hand.length; i++) {
+  var cards = [];
+  hand.forEach((card) => cards.push(card.v));
+  cards = [...new Set(cards)]
+  var cards = cards.sort((a, b) => b - a);
+  for (let i = 0; i < cards.length - 4; i++) {
     if (
-      hand[1].v == hand[0].v - 1 &&
-      hand[2].v == hand[0].v - 2 &&
-      hand[3].v == hand[0].v - 3 &&
-      hand[4].v == hand[0].v - 4
-    ) {
-      return [true, hand[0]];
-    }
+      cards[i] - 1 === cards[i + 1] &&
+      cards[i] - 2 === cards[i + 2] &&
+      cards[i] - 3 === cards[i + 3] &&
+      cards[i] - 4 === cards[i + 4]) {
+      return [true, {v: cards[i]}]
+      }
   }
   return false;
 }
@@ -88,7 +83,7 @@ function _4ofAKind(hand) {
       hand[i - 2].v == hand[i].v &&
       hand[i - 1].v == hand[i].v
     ) {
-      return [true, hand[i].v];
+      return [true, hand[i]];
     }
   }
   return false;
@@ -98,42 +93,42 @@ function _straightFlush(hand) {
   if (!hasFlush) return [false, null];
 
   for (const flushSuit of flushSuits) {
-    const straightCards = flushSuit.cards.sort((a, b) => a - b);
+    const straightCards = flushSuit.cards.sort((a, b) => b - a);
     if (
-      straightCards[0] + 1 === straightCards[1] &&
-      straightCards[1] + 1 === straightCards[2] &&
-      straightCards[2] + 1 === straightCards[3] &&
-      straightCards[3] + 1 === straightCards[4]
+      straightCards[0] - 1 === straightCards[1] &&
+      straightCards[1] - 1 === straightCards[2] &&
+      straightCards[2] - 1 === straightCards[3] &&
+      straightCards[3] - 1 === straightCards[4]
     ) {
-      return [true, straightCards[4]];
+      return [true, {v: straightCards[4]}];
     }
   }
   return [false, null];
 }
 
-function handEvaluation(hand) {
-  hand.sort((a, b) => b.v - a.v);
+function handEvaluation(hand, player) {
+  hand = hand.sort((a, b) => b.v - a.v);
   switch (true) {
     case _straightFlush(hand)[0] && _straightFlush(hand)[1].v == 14:
-      return [9, "Royal Flush"];
+      return { rank: 9, name: "Royal Flush" , player: player};
     case _straightFlush(hand)[0]:
-      return [8, "Straight Flush", hand[0].v];
+      return { rank: 8, name: "Straight Flush", cards: [_straightFlush(hand)[1]], kicker: { v: highCard(hand) } , player: player};
     case _4ofAKind(hand)[0]:
-      return [7, "4 Of A Kind", _4ofAKind(hand)[1]];
+      return { rank: 7, name: "4 Of A Kind", cards: _4ofAKind(hand)[1], kicker: { v: highCard(hand) } , player: player};
     case _fullHouse(hand)[0]:
-      return [6, "Full House", _3ofAKind(hand)[1], [_pair(hand)[1][0]]];
+      return { rank: 6, name: "Full House", cards: _3ofAKind(hand)[1], kicker: _pair(hand)[1][0] , player: player};
     case _flush(hand)[0]:
-      return [5, "Flush", _flush(hand)[1]];
+      return { rank: 5, name: "Flush", cards: _flush(hand)[1], kicker: { v: highCard(hand) } , player: player};
     case _straight(hand)[0]:
-      return [4, "Straight", _straight(hand)[1]];
+      return { rank: 4, name: "Straight", cards: [_straight(hand)[1]], kicker: { v: highCard(hand) } , player: player};
     case _3ofAKind(hand)[0]:
-      return [4, "3 Of A Kind", _3ofAKind(hand)[1], [{ v: highCard(hand) }]];
+      return { rank: 4, name: "3 Of A Kind", cards: _3ofAKind(hand)[1], kicker: { v: highCard(hand) } , player: player};
     case _pair(hand)[2] >= 2:
-      return [3, "2 Pair", _pair(hand)[1].slice(0, 2), [{ v: highCard(hand) }]];
+      return { rank: 3, name: "2 Pair", cards: _pair(hand)[1].slice(0, 2), kicker: { v: highCard(hand) } , player: player};
     case _pair(hand)[2] == 1:
-      return [2, "Pair", [_pair(hand)[1][0]], [{ v: highCard(hand) }]];
+      return { rank: 2, name: "Pair", cards: _pair(hand)[1], kicker: { v: highCard(hand) } , player: player};
     default:
-      return [1, "High Card", [{ v: highCard(hand) }]];
+      return { rank: 1, name: "High Card", cards: [{ v: highCard(hand) }] , kicker: { v: highCard(hand) } , player: player};
   }
 }
 

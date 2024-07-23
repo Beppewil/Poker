@@ -17,7 +17,7 @@ html {
   cursor: pointer;
   position: absolute;
 
-  z-index: 5;
+  z-index: 10;
 }
 .menuBTN:hover, .contentBTN:hover, .menuBTN.hover{
   background-color: #aaa;
@@ -30,7 +30,7 @@ html {
   width: 100px;
   height: 50px;
   opacity: 0;
-  z-index: 4;
+  z-index: 9;
   transition: 0.6s;
 }
 .wrapper.show {
@@ -48,13 +48,13 @@ html {
   color: white;
   width: 100px;
   height: 25px;
-  z-index: 5;
+  z-index: 9;
 }
 
 
 #call, #raise, #fold {
   text-align: center;
-  font-size: 24px;
+  font-size: 22px;
   color: white;
   border: 2px solid #007700;
   border-radius: 5px;
@@ -145,6 +145,20 @@ html {
   visibility: visible;
   backdrop-filter: blur(20px);
 }
+#settingsBlurer {
+  z-index: 9;
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100%;
+  backdrop-filter: blur(20px);
+  visibility: hidden;
+}
+#settingsBlurer.active {
+  visibility: visible;
+  backdrop-filter: blur(20px);
+}
 
 #comCard1 {
   left: 34%;
@@ -162,11 +176,11 @@ html {
   left: 66%;
 }
 
-#playerCard1 {
+#player1Card1 {
   left: 46%;
   top: 85%;
 }
-#playerCard2 {
+#player1Card2 {
   left: 53%;
   top: 85%;
 }
@@ -178,7 +192,7 @@ html {
   transform: translate(-50%,-50%);
   left: 90px;
   top: 23px;
-  z-index: 6;
+  z-index: 11;
   transition: 0.4s;
   cursor: pointer;
 }
@@ -403,4 +417,67 @@ html {
 }
 #optOutBTN.active {
   visibility: visible;
+}
+
+#playerOptions {
+  visibility: hidden;
+  left: 50%;
+  top: 30%;
+  transform: translate(-50%, -0%);
+  position: absolute;
+  width: 150px;
+  height: 50px;
+  background: #aaa;
+  z-index: 12;
+}
+#playerOptions.active {
+  visibility: visible;
+}
+.playerOptionsBTN {
+  visibility: hidden;
+  z-index: 12;
+  top: 20%;
+  position: absolute;
+}
+.playerOptionsBTN.active {
+  visibility: visible;
+}
+.playerOptionsBTN:nth-child(even) {
+  color: blue;
+  left: n + 10;
+}
+#player1options {
+  left: 10%;
+}
+#player2options {
+  left: 20%;
+}
+#player3options {
+  left: 30%;
+}
+#player4options {
+  left: 40%;
+}
+#player5options {
+  left: 50%;
+}
+#player6options {
+  left: 60%;
+}
+#player7options {
+  left: 70%;
+}
+#player8options {
+  left: 80%;
+}
+
+#pot {
+  top: 10%;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 25px;
+  background: white;
+  border: 2px solid black;
+  z-index: 4;
 }

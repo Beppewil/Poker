@@ -16,6 +16,7 @@ optOutBTN.addEventListener('click', optOUT)
 var optChoices = document.getElementById("optChoices")
 
 var currentBet = document.getElementById('currentBet')
+var betted = document.getElementById('betted')
 
 function _call() {
   socket.emit('playerBet', ['call', null])
@@ -35,7 +36,7 @@ socket.on('nextCards', (cards) => {
 })
 
 socket.on('dealCards', (cards) => {
-  script.HTMLCardDisplay(cards, 'playerCard')
+  script.HTMLCardDisplay(cards, 'player1Card')
 })
 
 socket.on('roundOver', (msg) => {
@@ -43,7 +44,7 @@ socket.on('roundOver', (msg) => {
   winners.push(...msg[0])
   if (winners.includes(msg[1])) {
     alert(`You win! ${msg[2]}`)
-  } else {alert("You Lose. \n Player(s) " + winners + " Win")}
+  } else {alert("You Lose. \n Player(s) " + msg[3] + " Win")}
 })
 
 socket.on('newRound', (cards) => {
@@ -91,7 +92,9 @@ function optOUT() {
   optInBTN.classList.add('active')
 }
 
-socket.on('optChoices', (balls) => {
+socket.on('optChoices', (reason) => {
+  //if (reason == '<2') {prompt("Not Enough players for game to continue")}
+  console.log("MAKE CHOICE")
   blurer.classList.add('active');
   optOutBTN.classList.add('active')
   optInBTN.classList.add('active')
@@ -110,6 +113,14 @@ socket.on('updateBet', (arr) => {
   console.log("UPDATED")
   currentBet.innerHTML = `Current Bet: ${arr[1]}`
 });
+
+socket.on('playerBet', (bet) => {
+  betted.innerHTML = `Betted: ${bet}`
+})
+
+socket.on('updatePot', (pot) => {
+  document.getElementById('pot').innerHTML = `Pot: ${pot}`
+})
 //on playerJoin 
 //create new div 'player'+i 
 //make css styles for each player 2-8 

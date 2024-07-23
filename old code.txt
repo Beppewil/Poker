@@ -1,0 +1,12 @@
+function filterProfanity(msg){
+  var filteredMessage = ''
+  const profanityList = require('./profanities.json');
+  const balls = msg.split(' ');
+  for (let ball in balls) {
+    console.log(balls[ball])
+    if (profanityList.includes(balls[ball].toLowerCase())) {
+      filteredMessage += ('love ')
+    }
+    else {filteredMessage += (balls[ball]) + ' '}
+  }
+}
