@@ -1,7 +1,7 @@
 //import {handEvaluation} from '../server/handEvaluation.js'
 //import {twoPlayerHandComparison, arrayHandComparison} from './handComparison.js'
 //import {deckCreate, cardDisplay, shuffle, cardValues} from '../server/cards.js'
-import {socket} from './menuActions.js'
+import {socket} from './socket.js'
 
 
 const cardValuesW = {
@@ -29,10 +29,17 @@ socket.on('playerDisconnect', (player) => {
 });
 
 function HTMLCardDisplay(Cards, handName) {
-  for (let i = 0; i < Cards.length; i++) {
-    let image = document.getElementById(`${handName}${i + 1}`);
-    image.src = `./Images/Playing Cards/PNG-cards-1.3/${cardValuesW[Cards[i].v]}_of_${cardValuesW[Cards[i].s]}.png`;
-    image.classList.add("active")
+  if (Cards === 'back') {
+    for (let i = 0; i < 2; i++) {
+      let image = document.getElementById(`${handName}${i + 1}`);
+      image.src = `views/Images/Playing Cards/PNG-cards-1.3/cardBack.png`
+    }
+  } else {
+    for (let i = 0; i < Cards.length; i++) {
+      let image = document.getElementById(`${handName}${i + 1}`);
+      image.src = `./Images/Playing Cards/PNG-cards-1.3/${cardValuesW[Cards[i].v]}_of_${cardValuesW[Cards[i].s]}.png`;
+      image.classList.add("active")
+    }
   }
 }
 

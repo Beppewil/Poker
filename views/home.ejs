@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" style="background: gray;">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="/views/style.css" rel="stylesheet" type="text/css" />
+  <title>Home</title>
+</head>
+<body>
+  <script>
+    // Declare lobbiesIDs as a global variable, kept in own script cause it messes format up
+    var lobbiesIDs = <%- JSON.stringify(lobbiesIDs) %>;
+  </script>
+  
+  <button id="createGame">Create Game</button>
+  <form action="/createLobby" method="post" id="createGameForm" class="">
+    <br><br><div class="inputLabel">Game Name:</div><br><br>
+    <input type="text" id="gameName" size="20" name="gameName" placeholder="Enter Game Name"  class="formText"><br><br><br><br><br>
+    <div class="inputLabel">Small Blind Value:</div><br><br>
+    <input type="number" id="blindValue" size="20" name="blindValue" placeholder="Enter Small Blind Value" class="formText" min="1"><br><br><br>
+    <div class="inputLabel">Private Lobby</div><br><br>
+    <input type="checkbox" id="privateCheckbox" name="privateCheckbox" value="true"><br>
+    <input type="password" id="passwordInput" class="formText" size="20" name="gamePassword" placeholder="Enter Password">
+    <button type="submit" id="submitForm">Create Game</button>
+  </form>  
+
+  <form action="/" method="post" id="lobbyForm">
+    <% for (let i = 1; i <= lobbiesIDs.length; i++) { %>
+      <div class="lobbyList">
+        <div style="margin-bottom: 10px;"><b><u><%= lobbiesIDs[i-1].name %>'s Lobby %> </u></b></div>
+        <div>Small Blind: <%= lobbiesIDs[i-1].blind %></div>
+        <div id="PlayerCount">Players: <%= lobbiesIDs[i-1].players %>/8</div>
+        <div id="joinPrivate" value="<%=lobbiesIDs[i-1].private %>" >Private: <%= lobbiesIDs[i-1].private %> </div>
+        <input type="hidden" name="lobbyId" value="<%=lobbiesIDs[i-1].id%>">
+        <button type="submit" name="joinLobby" id="joinLobby" value="<%=lobbiesIDs[i-1].id%>" class="joinButton">Join Lobby</button>
+      </div>
+    <% } %>
+  </form>
+
+
+    <script src="/socket.io/socket.io.js" defer></script>
+  <script type="module" defer>
+    import { socket } from './socket.js'
+    
+    const createGame = document.getElementById('createGame')
+    createGame.addEventListener('click', createGameForm)
+
+     function createGameForm() {
+       document.getElementById('createGameForm').classList.toggle('active')
+     }
+
+    const privateCheckbox = document.getElementById('privateCheckbox');
+    const passwordInput = document.getElementById('passwordInput')
+
+    privateCheckbox.addEventListener('click', () => {passwordInput.classList.toggle("active")})
+    
+    const gameName = document.getElementById('gameName');
+    const blindValue = document.getElementById('blindValue');
+    const submitForm = document.getElementById('submitForm');
+
+    blindValue.addEventListener('keydown', (e) => {
+      if (!e.key.match(/^(\d|Backspace|ArrowLeft|ArrowRight)$/)) { 
+        e.preventDefault();
+      }
+    });
+    
+
+
+    submitForm.addEventListener('click', (e) => {
+      e.preventDefault(); // Prevent default form submission
+      if (gameName.value.trim() !== '' && blindValue.value.trim() !== '' && !lobbiesIDs.find(lobby => lobby.name.toLowerCase() === gameName.value.toLowerCase())) {
+        document.getElementById('createGameForm').submit(); // Submit the form if both fields are filled
+      } else {
+        if (gameName.value.trim() == '' || lobbiesIDs.find(lobby => lobby.name.toLowerCase() === gameName.value.toLowerCase())) {
+          gameName.classList.add("notFilled")
+        } else {gameName.classList.remove("notFilled")}
+        if (blindValue.value.trim() == '') {
+          blindValue.classList.add("notFilled")
+        } else {blindValue.classList.remove("notFilled")}
+        if (lobbiesIDs.find(lobby => lobby.name.toLowerCase() === gameName.value.toLowerCase())) {
+          alert("Lobby Name Taken")
+        }        
+      }
+    });
+
+    
+    const joinLobbyButtons = document.querySelectorAll('.joinButton');
+    joinLobbyButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        const lobbyId = button.value;
+        const lobby = lobbiesIDs.find(lobby => lobby.id == lobbyId);
+        if (lobby.private) {
+          const password = prompt("Enter password for this private lobby:");
+          socket.emit('joinPrivateLobby', lobbyId, password)
+        } else {
+          document.getElementById('lobbyForm').submit();
+        }
+      });
+    });
+
+    socket.on('joinAttempt', (lobbyID) => {
+      if (lobbyID != null) window.location.href += lobbyID;
+      else alert("Incorrect Password")
+    })
+    
+    socket.on('newButton', (lobbies, lobbyName) => {
+      const newButton = document.createElement('div');
+      newButton.classList.add('lobbyList');
+      const nameDiv = document.createElement('div');
+      nameDiv.style.marginBottom = '10px';
+      nameDiv.innerHTML = `<b><u>${lobbyName}'s Lobby</u></b>`;
+      newButton.appendChild(nameDiv);
+      const blindDiv = document.createElement('div');
+      blindDiv.textContent = `Small Blind: ${lobbies[lobbies.length].blind}`;
+      newButton.appendChild(blindDiv);
+      const playersDiv = document.createElement('div');
+      playersDiv.textContent = `Players: ${lobbies[lobbies.length].players}/8`;
+      newButton.appendChild(playersDiv);
+      const joinButton = document.createElement('button');
+      joinButton.type = 'submit';
+      joinButton.name = 'lobby';
+      joinButton.value = `${lobbies.length}`;
+      joinButton.textContent = 'Join Lobby';
+      joinButton.classList.add('joinButton');
+      newButton.appendChild(joinButton);
+      document.getElementById('lobbyForm').appendChild(newButton);
+      });
+
+  </script>
+</body>
+</html>

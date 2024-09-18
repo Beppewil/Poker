@@ -1,0 +1,745 @@
+html {
+  height: 100%;
+  width: 100%;
+  background-color: #000;
+}
+.aspect-ratio-container {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  box-sizing: border-box;
+  position: relative;
+  background-image: url(Images/poker-table.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+
+#menuBtnWrapper {
+  position: absolute;
+  width: 104px;
+  height: 30px;
+}
+
+.menuBTN {
+  background-color: whitesmoke;
+  border: solid 2px black;
+  color: black;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  font-size: 16px;
+  cursor: pointer;
+  position: absolute;
+  z-index: 10;
+}
+.menuBTN:hover, .contentBTN:hover, .menuBTN.hover{
+  background-color: #aaa;
+}
+.wrapper {
+  position: absolute;
+  background-color: grey;
+  border: solid 2px black;
+  color: white;
+  width: 100px;
+  height: 50px;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 9;
+  transition: 0.6s;
+}
+.wrapper.show {
+  display: inline-block;
+  opacity: 1;
+  visibility: visible;
+  transform: translate(0, 28px);
+  transition: 0.9s;
+}
+.contentBTN {
+  display: block;
+  user-select: none;
+  text-align: center;
+  background-color: grey;
+  border: 2px solid #2222;
+  color: white;
+  width: 100px;
+  height: 25px;
+  z-index: 9;
+}
+
+
+#call, #raise, #fold {
+  text-align: center;
+  font-size: 22px;
+  color: white;
+  border: 2px solid #007700;
+  border-radius: 5px;
+  width: 150px;
+  height: 40px;
+  transform: translate(-50%,-50%);
+  left: 85%;
+  display: inline-block;
+  z-index: 2;
+}
+
+#call {
+  position: absolute;
+  background-color: #00aa00;
+  border-color: #005500;
+  top: 75%;
+}
+#call:hover {
+  background-color: #007700;
+  width: 160px;
+  height: 45px;
+}
+
+#raise {
+  position: absolute;
+  background-color: #00aa00;
+  top: 80%;
+}
+#raise:hover {
+  background-color: #009900;
+  width: 160px;
+  height: 45px;
+}
+
+#fold {
+  position: absolute;
+  background-color: #8f0000;
+  border-color: #550000;
+  top: 85%;
+}
+#fold:hover {
+  background-color: #990000;
+  width: 160px;
+  height: 45px;
+}
+
+#fold:active, #call:active, #raise:active {
+  background-color: pink;
+}
+
+.playerChoices {
+  visibility: hidden;
+}
+.playerChoices.active {
+  visibility: visible;
+}
+
+.paused {
+  filter: blur(20px);
+  transition: 0.3s;
+}
+
+.card {
+  padding: 10px;
+  width: 65px; /* Adjust as needed */
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 5px;
+  position: absolute;
+  transform: translate(-50%,-50%);
+  top: 50%;
+  transition: 0.5s;
+  z-index: 1;
+  visibility: hidden;
+}
+
+#blurer {
+  z-index: 4;
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100%;
+  visibility: hidden;
+}
+#blurer.active {
+  visibility: visible;
+  backdrop-filter: blur(20px);
+}
+#settingsBlurer {
+  z-index: 9;
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100%;
+  backdrop-filter: blur(20px);
+  visibility: hidden;
+}
+#settingsBlurer.active {
+  visibility: visible;
+  backdrop-filter: blur(20px);
+}
+
+#comCard1 {
+  left: 34%;
+}
+#comCard2 {
+  left: 42%;
+}
+#comCard3 {
+  left: 50%;
+}
+#comCard4 {
+  left: 58%;
+}
+#comCard5 {
+  left: 66%;
+}
+
+#black-triangle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  transform: translate(-50%,-50%);
+  left: 80%;
+  top: 50%;
+  z-index: 11;
+  transition: 0.4s;
+  cursor: pointer;
+  transform-origin: center;
+}
+
+#black-triangle.rotate90 {
+  transform: rotate(90deg) translate(-50%,50%);
+  transition: 0.6s;
+  left: 80%;
+  transform-origin: center;
+}
+
+/* Chat button styles */
+#chat-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  z-index: 2;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Chat window styles */
+#chat-window {
+  position: fixed;
+  bottom: 20px;
+  left: 80px;
+  width: 300px;
+  height: 400px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  z-index: 3;
+  display: none;
+}
+
+/* Show chat window on hover */
+#chat-window.active {
+  display: block;
+}
+
+/* Chat messages styles */
+#messages {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  height: 80%;
+  overflow-y: auto;
+}
+
+#messages li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+#messages li:last-child {
+  border-bottom: none;
+}
+
+/* Chat form styles */
+#chat-form {
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+#input {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px black solid;
+  border-radius: 5px;
+  background-color: #f2f2f2;
+}
+
+#chat-send {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#chat-send:hover {
+  background-color: #444;
+}
+
+.player {
+  visibility: hidden;
+}
+
+#player1 {
+  top: 79%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  position: absolute;
+}
+
+#player2 { 
+  top: 76%; 
+  left: 25%; 
+  transform: translate(-50%, -50%);
+  position: absolute;
+}
+
+#player3 { 
+  left: 19%; 
+  top: 50%; 
+  transform: translate(-50%, -50%);
+  position: absolute;
+}
+
+#player4 { 
+  top: 23%;
+  left: 27%; 
+  transform: translate(-50%, -50%);
+  position: absolute;
+}
+
+#player5 { 
+  left: 50%; 
+  top: 22%; 
+  transform: translate(-50%, -50%);
+  position: absolute;
+}
+
+#player6 { 
+  top: 22%;
+  left: 74%; 
+  transform: translate(-50%, -50%);
+  position: absolute;
+}
+
+#player7 { 
+  left: 81%; 
+  top: 50%; 
+  transform: translate(-50%, -50%);
+  position: absolute;
+}
+
+#player8 { 
+  left: 73%; 
+  top: 77%; 
+  transform: translate(-50%, -50%);
+  position: absolute;
+}
+
+#currentBet {
+  top: -230%;
+  left: 400%;
+  position: absolute;
+  font-size: 30px;
+  background: white;
+  border: 2px solid black;
+  z-index: 4;
+}
+#betted {
+  top: -190%;
+  left: 400%;
+  position: absolute;
+  font-size: 30px;
+  background: white;
+  border: 2px solid black;
+  z-index: 4;
+}
+
+#arrow {
+  position: absolute;
+  width: 75px;
+}
+
+.a1 {
+  top: 66%; 
+  left: 48%;
+  rotate: 90deg;
+}
+.a2 {
+  top: 66%; 
+  left: 32%;
+  rotate: 100deg;
+}
+.a3 {
+  top: 55%; 
+  left: 24%;
+  rotate: 180deg;
+}
+.a4 {
+  top: 66%; 
+  left: 32%;
+  rotate: 90deg;
+}
+.a5 {
+  top: 66%; 
+  left: 48%;
+  rotate: 90deg;
+}
+.a6 {
+  top: 66%; 
+  left: 60%;
+  rotate: 90deg;
+}
+.a7 {
+  top: 66%; 
+  left: 72%;
+  rotate: 90deg;
+}
+.a8 {
+  top: 66%; 
+  left: 60%;
+  rotate: 90deg;
+}
+
+#optInBTN {
+  visibility: hidden;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -0%);
+  position: absolute;
+  width: 150px;
+  height: 50px;
+  background: #aaa;
+  z-index: 4;
+}
+#optOutBTN {
+  visibility: hidden;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -0%);
+  position: absolute;
+  width: 150px;
+  height: 50px;
+  background: #aaa;
+  z-index: 4;
+}
+
+#optInBTN.active {
+  visibility: visible;
+}
+#optOutBTN.active {
+  visibility: visible;
+}
+
+#playerOptions {
+  visibility: hidden;
+  left: 50%;
+  top: 30%;
+  transform: translate(-50%, -0%);
+  position: absolute;
+  width: 150px;
+  height: 50px;
+  background: #aaa;
+  z-index: 12;
+}
+#playerOptions.active {
+  visibility: visible;
+}
+.playerOptionsBTN {
+  visibility: hidden;
+  z-index: 12;
+  top: 20%;
+  position: absolute;
+}
+.playerOptionsBTN.active {
+  visibility: visible;
+}
+.playerOptionsBTN:nth-child(even) {
+  color: blue;
+  left: n + 10;
+}
+#player1options {
+  left: 10%;
+}
+#player2options {
+  left: 20%;
+}
+#player3options {
+  left: 30%;
+}
+#player4options {
+  left: 40%;
+}
+#player5options {
+  left: 50%;
+}
+#player6options {
+  left: 60%;
+}
+#player7options {
+  left: 70%;
+}
+#player8options {
+  left: 80%;
+}
+
+#pot {
+  top: 10%;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 25px;
+  background: white;
+  border: 2px solid black;
+  z-index: 4;
+}
+
+#createGame {
+  position: absolute;
+  top: 5%;
+  left: 80%;
+  transform: translate(-50%, -50%);
+  width: 150px;
+  height: 50px;
+  background-color: grey;
+  border: solid 2px black;
+  border-radius: 10px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  cursor: pointer;
+  user-select: none;
+  margin: 2px;
+}
+#createGame:active {
+  background-color: darkgrey;
+}
+
+#gameTimer {
+  position: absolute;
+  top: 10%;
+  left: 60%;
+  transform: translateX(-50%);
+  font-size: 25px;
+  color: white;
+  border: 2px solid black;
+  z-index: 4;
+  visibility: hidden;
+}
+#gameTimer.active {
+  visibility: visible;
+}
+
+#createGameForm {
+  border: 2px solid black;
+  border-radius: 10px;
+  position: absolute;
+  background-color: whitesmoke;
+  top: 50%;
+  left:50%; 
+  transform: translate(-50%, -50%);
+  width: 400px;
+  height: 500px;
+  box-shadow: 3px 2px #333;
+  visibility: hidden;
+  z-index: 4;
+}
+#createGameForm.active {
+  visibility: visible;
+}
+
+#submitForm {
+  position: absolute;
+  top: 85%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 50px;
+  background-color: grey;
+  border: solid 2px black;
+  border-radius: 10px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  cursor: pointer;
+  user-select: none;
+  z-index: 5;
+}
+
+.formText { 
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 40px;
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 5px;
+  font-size: 18px;
+  margin-bottom: 50px;
+  text-align: center;
+  z-index: 5;
+}
+.inputLabel {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 20px;
+}
+
+.formText.notFilled {
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.9);
+}
+
+#lobbyForm {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  height: 75%;
+  background-color: grey;
+  border: solid 2px black;
+  border-radius: 10px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  cursor: pointer;
+  user-select: none;
+  overflow-y: auto; /* Enable scrolling */
+  z-index: 2;
+}
+
+.lobbyList {
+  border-bottom: 2px solid black;
+  padding: 10px;
+  width: 100%; /* Ensure lobby list items fill the width */
+  box-sizing: border-box; /* Include padding and borders in the width */
+  z-index: 3;
+}
+
+.lobbyList:nth-child(even) {
+  background: #777; ;
+}
+
+.joinButton {
+  position: relative;
+  left: 99%;
+  top: 50%;
+  transform: translate(-100%, -50%);
+  width: 150px;
+  height: 50px;
+  background-color: grey;
+  border: solid 2px black;
+  border-radius: 10px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  cursor: pointer;
+  user-select: none;
+  margin: 2px;
+}
+
+#privateCheckbox {
+  left:50%;
+  transform: translate(-100%, -50%);
+  position: relative;
+}
+
+
+#passwordInput {visibility: hidden;}
+#passwordInput.active {
+  visibility: visible;
+}
+
+.player-container {
+  background-color: #000;
+  border: 5px rgb(59, 59, 59) solid;
+  border-radius: 20px;
+  padding: 30px 20px 5px 20px; /* Add extra 30px to the top padding */
+  width: 150px; /* Adjust as needed */
+  position: relative;
+  display: flex;
+  color: white;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.card-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+  position: absolute;
+  top: -50px;
+  left: 15%;
+}
+
+.card-slot {
+  padding: 10px;
+  width: 50px; /* Adjust as needed */
+  z-index: 2;
+  position: relative;
+}
+
+.player-options {
+  width: 3vh;
+  height: 3vh;
+  left: 1.5vh;
+  top: 1vh;
+  z-index: 2;
+  cursor: pointer;
+  position: absolute;
+}
+
+.field {
+  margin-bottom: 0px;
+}
+
+.field h3 {
+  margin: 10px 0px 10px 0px;
+  font-size: 18px; /* Adjust as needed */
+}
+
+.separator {
+  height: 2px;
+  background-color: red;
+  margin: 5px 0; /* Adjust as needed */
+}
+
+
+
+
+
+
+
+
+
+
+.playing {
+  border-color: green;
+}
+
+.folded {
+  opacity: 80%;
+  border-color: gray;
+}
+
+.turn {
+  border-color: red;
+}
+
+.active {
+  visibility: visible;
+}

@@ -1,0 +1,221 @@
+function filterProfanity(msg){
+  var filteredMessage = ''
+  const profanityList = require('./profanities.json');
+  const balls = msg.split(' ');
+  for (let ball in balls) {
+    console.log(balls[ball])
+    if (profanityList.includes(balls[ball].toLowerCase())) {
+      filteredMessage += ('love ')
+    }
+    else {filteredMessage += (balls[ball]) + ' '}
+  }
+}
+
+
+
+
+Start of sidepots and shit
+        for (let player2 in this.players) {
+          if (this.players[player2].totalbet / winners.length <= this.players[player].maxWin) {
+            this.players[player].money += Math.floor(this.players[player2].totalbet / winners.length)
+          } else {this.players[player].money += this.players[player].maxWin}
+        }
+
+Object.values(this.players).sort((a, b) => b.maxWin - a.maxWin); //sort the players by their max wins
+
+
+
+
+NEW ROUND END FUNCTION
+
+roundEnd() {
+  var comparisonArray = [];
+  //displaying each players cards
+  for (let player in this.players) {
+    var tempCards = [];
+    tempCards.push(...this.playerCards); 
+    tempCards.splice(tempCards.indexOf(this.players[player].hand), 1); //removing the players cards from the array
+    this.players[player].socket.emit("showCards", tempCards);
+  }
+
+  for (let player in this.players) {
+    if (this.players[player].folded == false && this.players[player].playing == true) {
+      for (let card in this.comCards) {
+        this.players[player].hand.push(this.comCards[card]);
+      }
+      comparisonArray.push({c: this.players[player].hand, p: this.players[player].playerNum});
+      this.players[player].playing = null;
+    } else {
+      for (let card in this.comCards) {
+        this.players[player].hand.push(this.comCards[card]);
+      }
+    }
+  }
+
+  if (comparisonArray.length > 1) {
+    var winner = _handComparison.handComparison(comparisonArray);
+    var winners = [];
+    var winnersUsernames = [];
+    winner.forEach(p => {
+      winners.push(p.player)
+    })
+    for (let player in this.players) {
+      if (winners.includes(this.players[player].playerNum)) {winnersUsernames.push("'"+this.players[player].username+"'")}
+    }
+  } else {
+    for (let player in players) {
+      if (this.players[player].folded == false) {
+        var winners = [this.players[player].playerNum];
+        var winnersUsernames = [this.players[player].username]
+      }
+    }
+  }
+
+  // Implement sidepots
+  var sidePots = [];
+  var mainPot = this.pot;
+  var playersRemaining = Object.keys(this.players).filter(key => this.players[key].folded == false);
+
+  for (let i = 0; i < playersRemaining.length; i++) {
+    var player = this.players[playersRemaining[i]];
+    var betAmount = player.totalbet;
+    var eligiblePlayers = playersRemaining.filter(key => this.players[key].totalbet >= betAmount);
+    var sidePotAmount = eligiblePlayers.reduce((acc, key) => acc + Math.min(betAmount, this.players[key].totalbet), 0);
+    sidePots.push({ amount: sidePotAmount, eligiblePlayers: eligiblePlayers.map(key => this.players[key].playerNum) });
+    mainPot -= sidePotAmount;
+  }
+
+  // Award sidepots
+  for (let i = 0; i < sidePots.length; i++) {
+    var sidePot = sidePots[i];
+    var winnerIndex = winners.indexOf(sidePot.eligiblePlayers[0]);
+    if (winnerIndex !== -1) {
+      var winnerPlayerNum = winners[winnerIndex];
+      this.players[winnerPlayerNum].money += sidePot.amount;
+      this.players[winnerPlayerNum].socket.emit("updateMoney", this.players[winnerPlayerNum].money);
+    } else {
+      // Award sidepot to next best hand
+      var nextBestHand = _handComparison.handComparison(sidePot.eligiblePlayers.map(playerNum => {
+        var player = Object.values(this.players).find(player => player.playerNum === playerNum);
+        return player.hand;
+      }));
+      var nextBestPlayerNum = nextBestHand[0].player;
+      this.players[nextBestPlayerNum].money += sidePot.amount;
+      this.players[nextBestPlayerNum].socket.emit("updateMoney", this.players[nextBestPlayerNum].money);
+    }
+  }
+
+  // Award main pot
+  if (mainPot > 0) {
+    var mainPotWinnerIndex = winners.indexOf(winners[0]);
+    var mainPotWinnerPlayerNum = winners[mainPotWinnerIndex];
+    this.players[mainPotWinnerPlayerNum].money += mainPot;
+    this.players[mainPotWinnerPlayerNum].socket.emit("updateMoney", this.players[mainPotWinnerPlayerNum].money);
+  }
+
+  for (let player in this.players) {
+    this.players[player].socket.emit("roundOver", [
+      winners,
+      this.players[player].playerNum,
+      _handEvaluation.handEvaluation(this.players[player].hand).name,
+      winnersUsernames,
+    ]);
+    this.players[player].playing = null;
+  }
+
+  this.io.to(this.roomID).emit('optChoices', 'balls')
+  this.io.to(this.roomID).emit("nextCards", '');
+  this.io.to(this.roomID).emit('updatePot', 0)
+  this.gameStarted = false;
+}
+
+
+
+
+
+socket.on('updatePlayerList', (playerList, playerNumber) => {
+   console.log(playerList)
+   for (var i = 0; i < 8; i++) {
+      document.getElementById(`player${i + 1}options`).innerHTML = ''
+      document.getElementById(`player${i + 1}options`).classList.remove('active')
+      document.getElementById(`player${i + 1}`).classList.remove("active")
+      document.getElementById(`player${i + 1}Container`).classList.remove('playing folded')
+      if (i > 1 && i < 8) {
+      document.getElementById(`player${i}Card1`).classList.remove('active')
+      document.getElementById(`player${i}Card2`).classList.remove('active')
+      }
+   }
+   playerList.forEach(player => {
+      document.getElementById(`player${player.playerNum}`).classList.add("active")
+      document.getElementById(`player${player.playerNum}options`).innerHTML = player.playerNum
+      document.getElementById(`player${player.playerNum}Card1`).classList.add('active')
+      document.getElementById(`player${player.playerNum}Card2`).classList.add('active')
+   })
+   if (playerNumber !== 1) {
+      playerList.forEach(player => {
+         if (player.playerNum === playerNumber) { 
+            document.getElementById(`player1Name`).innerHTML = player.username
+            document.getElementById(`player1Money`).innerHTML = player.money
+            document.getElementById(`player1LastAction`).innerHTML = player.lastAction
+            if (player.playing) {
+               document.getElementById('player1Container').classList.add('playing')
+            } else {
+               document.getElementById('player1Container').classList.remove('playing')
+               if (player.folded) {document.getElementById(`player1Container`).classList.add('folded')}
+            }
+         }
+         else {
+            if (player.playerNum < playerNumber) {
+               document.getElementById(`player${player.playerNum + 1}Name`).innerHTML = player.username
+               document.getElementById(`player${player.playerNum + 1}Money`).innerHTML = player.money
+               document.getElementById(`player${player.playerNum + 1}LastAction`).innerHTML = player.lastAction
+               if (player.playing) {
+                  document.getElementById(`player${player.playerNum + 1}Container`).classList.add('playing')
+               } 
+               else {
+                  document.getElementById(`player${player.playerNum + 1}Container`).classList.remove('playing')
+                  if (player.folded) {document.getElementById(`player${player.playerNum + 1}Container`).classList.add('folded')}
+               }
+            } else {
+               document.getElementById(`player${ player.playerNum }Name`).innerHTML = player.username
+               document.getElementById(`player${ player.playerNum }Money`).innerHTML = player.money
+               document.getElementById(`player${ player.playerNum }LastAction`).innerHTML = player.lastAction
+               if (player.playing) {
+                  document.getElementById(`player${player.playerNum + 1}Container`).classList.add('playing')
+               } 
+               else {
+                  document.getElementById(`player${player.playerNum}Container`).classList.remove('playing')
+                  if (player.folded) {document.getElementById(`player${player.playerNum}Container`).classList.add('folded')}
+               }
+            }
+         }
+      })
+   } 
+   else {
+      playerList.forEach(player => {
+         if (player.playerNum === playerNumber) { 
+            document.getElementById(`player1Name`).innerHTML = player.username
+            document.getElementById(`player1Money`).innerHTML = player.money
+            document.getElementById(`player1LastAction`).innerHTML = player.lastAction
+            if (player.playing) {
+               document.getElementById('player1Container').classList.add('playing')
+            } else {
+               document.getElementById('player1Container').classList.remove('playing')
+               if (player.folded) {document.getElementById(`player1Container`).classList.add('folded')}
+            }
+         }
+         else {
+            document.getElementById(`player${player.playerNum}Name`).innerHTML = player.username
+            document.getElementById(`player${player.playerNum}Money`).innerHTML = player.money
+            document.getElementById(`player${player.playerNum}LastAction`).innerHTML = player.lastAction
+            if (player.playing) {
+               document.getElementById(`player${player.playerNum + 1}Container`).classList.add('playing')
+            } 
+            else {
+               document.getElementById(`player${player.playerNum}Container`).classList.remove('playing')
+               if (player.folded) {document.getElementById(`player${player.playerNum}Container`).classList.add('folded')}
+            }
+         }
+      })
+   }
+})

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Poker</title>
+    <link href="/views/style.css" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+    <div class="aspect-ratio-container">
+
+    <div id="blurer"></div>
+    <div id="settingsBlurer"></div>
+
+    <div class="menu">
+        <div id="menuBtnWrapper">
+          <button class="menuBTN" id="menuBTN">Menu</button>
+          <img src="./Images/black-triangle.png" id="black-triangle">
+        </div>
+        <div class="wrapper" id="wrapper">
+            <div class="content">
+                <button class="contentBTN" id="optionsBTN">Options</button>
+                <form method="get" action="/" id="leaveBTN">
+                    <button type="submit" class="contentBTN">Leave</button>
+                </form>
+            </div>
+        </div>
+        <!-- Chat button -->
+        <img id="chat-btn" src="./Images/chat.png" draggable="false">
+
+        <!-- Chat window -->
+        <div id="chat-window">
+        <!-- Chat messages -->
+        <ul id="messages"></ul>
+
+        <!-- Chat form -->
+        <div id="chat-form">
+            <input id="input" autocomplete="off" />
+            <button id="chat-send">Send</button>
+        </div>
+        </div>
+        <button id="playerOptions">Player Options</button> <!-- Player Options (kick/promote to leader/ BAN)-->
+        
+        <button id="player1options" class="playerOptionsBTN"></button>
+        <button id="player2options" class="playerOptionsBTN"></button>
+        <button id="player3options" class="playerOptionsBTN"></button>
+        <button id="player4options" class="playerOptionsBTN"></button>
+        <button id="player5options" class="playerOptionsBTN"></button>
+        <button id="player6options" class="playerOptionsBTN"></button>
+        <button id="player7options" class="playerOptionsBTN"></button>
+        <button id="player8options" class="playerOptionsBTN"></button>
+    </div>
+    
+
+    <div id="game">
+
+        <div id="gameTimer"></div>
+
+        <div id="pot">Pot: 0</div>
+
+        <div class="optChoices" id="optChoices">
+            <button id="optInBTN" >PLAY NEXT ROUND</button>
+            <button id="optOutBTN" >SIT OUT</button>
+        </div>
+
+        <div id="communityCards">
+            <img src="" id="comCard1" class="card" draggable="false">
+            <img src="" id="comCard2" class="card" draggable="false">
+            <img src="" id="comCard3" class="card" draggable="false">
+            <img src="" id="comCard4" class="card" draggable="false">
+            <img src="" id="comCard5" class="card" draggable="false">
+        </div>
+
+        <div id="playerChoices" class="playerChoices active">
+            <button id="call" class="button">CALL/CHECK</button>
+            <button id="raise" class="button">RAISE</button>
+            <button id="fold" class="button">FOLD</button>
+        </div>
+
+        <div id="player1" class="player">
+            <div id="betted">Betted: 0</div>
+            <div id="currentBet">Current Bet: 0</div>
+            <div class="card-container" >
+                <img src="" id="player1Card1" class="card-slot" draggable="false">
+                <img src="" id="player1Card2" class="card-slot" draggable="false">
+              </div>
+            <div class="player-container" id="player1Container">
+                <div class="field" >
+                    <h3 id="player1Name">Name</h3>
+                    <div class="separator"></div>
+                </div>
+                <div class="field">
+                    <h3 id="player1Money">Money</h3>
+                    <div class="separator"></div>
+                </div>
+                <div class="field" >
+                    <h3 id="player1LastAction">Last action</h3>
+                </div>
+            </div>
+        </div>
+
+        <div id="player2" class="player">
+            <div class="card-container">
+                <img src="" id="player2Card1" class="card-slot" draggable="false">
+                <img src="" id="player2Card2" class="card-slot" draggable="false">
+              </div>
+            <div class="player-container" id="player2Container">
+                <div class="field" >
+                    <h3 id="player2Name">Name</h3>
+                    <div class="separator"></div>
+                </div>
+                <div class="field">
+                    <h3 id="player2Money">Money</h3>
+                    <div class="separator"></div>
+                </div>
+                <div class="field">
+                    <h3 id="player2LastAction">Last action</h3>
+                </div>
+            </div>
+        </div>
+
+        <div id="player3" class="player">
+            <div class="card-container">
+              <img src="" id="player3Card1" class="card-slot" draggable="false">
+              <img src="" id="player3Card2" class="card-slot" draggable="false">
+            </div>
+            <div class="player-container" id="player3Container">
+              <div class="field">
+                <h3 id="player3Name">Name</h3>
+                <div class="separator"></div>
+              </div>
+              <div class="field">
+                <h3 id="player3Money">Money</h3>
+                <div class="separator"></div>
+              </div>
+              <div class="field">
+                <h3 id="player3LastAction">Last action</h3>
+              </div>
+            </div>
+          </div>
+          
+          <div id="player4" class="player">
+            <div class="card-container">
+              <img src="" id="player4Card1" class="card-slot" draggable="false">
+              <img src="" id="player4Card2" class="card-slot" draggable="false">
+            </div>
+            <div class="player-container" id="player4Container">
+              <div class="field">
+                <h3 id="player4Name">Name</h3>
+                <div class="separator"></div>
+              </div>
+              <div class="field">
+                <h3 id="player4Money">Money</h3>
+                <div class="separator"></div>
+              </div>
+              <div class="field">
+                <h3 id="player4LastAction">Last action</h3>
+              </div>
+            </div>
+          </div>
+          
+          <div id="player5" class="player">
+            <div class="card-container">
+              <img src="" id="player5Card1" class="card-slot" draggable="false">
+              <img src="" id="player5Card2" class="card-slot" draggable="false">
+            </div>
+            <div class="player-container" id="player5Container">
+              <div class="field">
+                <h3 id="player5Name">Name</h3>
+                <div class="separator"></div>
+              </div>
+              <div class="field">
+                <h3 id="player5Money">Money</h3>
+                <div class="separator"></div>
+              </div>
+              <div class="field">
+                <h3 id="player5LastAction">Last action</h3>
+              </div>
+            </div>
+          </div>
+          
+          <div id="player6" class="player">
+            <div class="card-container">
+              <img src="" id="player6Card1" class="card-slot" draggable="false">
+              <img src="" id="player6Card2" class="card-slot" draggable="false">
+            </div>
+            <div class="player-container" id="player6Container">
+              <div class="field">
+                <h3 id="player6Name">Name</h3>
+                <div class="separator"></div>
+              </div>
+              <div class="field">
+                <h3 id="player6Money">Money</h3>
+                <div class="separator"></div>
+              </div>
+              <div class="field">
+                <h3 id="player6LastAction">Last action</h3>
+              </div>
+            </div>
+          </div>
+          
+          <div id="player7" class="player">
+            <div class="card-container">
+              <img src="" id="player7Card1" class="card-slot" draggable="false">
+              <img src="" id="player7Card2" class="card-slot" draggable="false">
+            </div>
+            <div class="player-container" id="player7Container">
+              <div class="field">
+                <h3 id="player7Name">Name</h3>
+                <div class="separator"></div>
+              </div>
+              <div class="field">
+                <h3 id="player7Money">Money</h3>
+                <div class="separator"></div>
+              </div>
+              <div class="field">
+                <h3 id="player7LastAction">Last action</h3>
+              </div>
+            </div>
+          </div>
+          
+          <div id="player8" class="player">
+            <div class="card-container">
+              <img src="" id="player8Card1" class="card-slot" draggable="false">
+              <img src="" id="player8Card2" class="card-slot" draggable="false">
+            </div>
+            <div class="player-container" id="player8Container">
+              <div class="field">
+                <h3 id="player8Name">Name</h3>
+                <div class="separator"></div>
+              </div>
+              <div class="field">
+                <h3 id="player8Money">Money</h3>
+                <div class="separator"></div>
+              </div>
+              <div class="field">
+                <h3 id="player8LastAction">Last action</h3>
+              </div>
+            </div>
+          </div>
+
+
+    </div>
+
+    <script src="./script.js" type="module"></script>
+    <script src="./menuActions.js" type="module"></script>
+    <script src="./playerActions.js" type="module"></script>
+
+    <script type="module" >
+        import { socket } from './socket.js'
+        socket.emit('joinRoom', '<%= room %>');
+    </script>
+
+</body>
+
+</html>
