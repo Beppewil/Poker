@@ -3,12 +3,19 @@ var settingsBlurer = document.getElementById('settingsBlurer')
 var menuBTN = document.getElementById('menuBTN')
 var chatBTN = document.getElementById('chat-btn')
 var optionsBTN = document.getElementById('optionsBTN')
+<<<<<<< HEAD
 const leaveBTN = document.getElementById('leaveBTN')
 var blackTriangle = document.getElementById("black-triangle")
 var playerOptionsBTN = document.getElementById("playerOptions")
 var gameTimer = document.getElementById('gameTimer')
 
 import { socket } from './socket.js'
+=======
+var blackTriangle = document.getElementById("black-triangle")
+var playerOptionsBTN = document.getElementById("playerOptions")
+
+const socket = io()
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
 
 blackTriangle.addEventListener('mouseover', function() {
   menuBTN.classList.add('hover');
@@ -23,7 +30,10 @@ playerOptionsBTN.addEventListener('click', playerOptions)
 
 function menuPress() {
    document.getElementById("wrapper").classList.toggle("show");
+<<<<<<< HEAD
    document.getElementById("")
+=======
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
    blackTriangle.classList.toggle("rotate90");
 }
 
@@ -39,12 +49,15 @@ function options() {
    }
 }
 
+<<<<<<< HEAD
 leaveBTN.addEventListener('click', leave)
 
 function leave() {
    socket.emit('leaveRoom', true)
 }
 
+=======
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
 function playerOptions() {
    for (var i = 0; i < 8; i++) {
       if (document.getElementById(`player${i + 1}options`).innerHTML.length > 0) {
@@ -86,18 +99,26 @@ function playerKick8() {
    socket.emit('playerKick', 8)
 }
 
+<<<<<<< HEAD
 socket.on('updatePlayerList', (playerList, playerNumber) => {
    console.log(playerList)
    for (var i = 0; i < 8; i++) {
       document.getElementById(`player${i + 1}options`).innerHTML = ''
       document.getElementById(`player${i + 1}options`).classList.remove('active')
       document.getElementById(`player${i + 1}`).classList.remove("active")
+=======
+socket.on('updatePlayerList', (playerList) => {
+   for (var i = 0; i < 8; i++) {
+      document.getElementById(`player${i + 1}options`).innerHTML = ''
+      document.getElementById(`player${i + 1}options`).classList.remove('active')
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
       if (i > 1 && i < 8) {
       document.getElementById(`player${i}Card1`).classList.remove('active')
       document.getElementById(`player${i}Card2`).classList.remove('active')
       }
    }
    playerList.forEach(player => {
+<<<<<<< HEAD
       document.getElementById(`player${player.playerNum}`).classList.add("active")
       document.getElementById(`player${player.playerNum}options`).innerHTML = player.username
       document.getElementById(`player${player.playerNum}Card1`).classList.add('active')
@@ -137,6 +158,12 @@ socket.on('updatePlayerList', (playerList, playerNumber) => {
          }
       })
    }
+=======
+      document.getElementById(`player${player.p}options`).innerHTML = player.n
+      document.getElementById(`player${player.p}Card1`).classList.add('active')
+      document.getElementById(`player${player.p}Card2`).classList.add('active')
+   })
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
 })
 
 
@@ -165,7 +192,11 @@ socket.on('chat message', function(msg) {
    item.textContent = msg[0] + ": " + msg[1];
    messages.appendChild(item);
    messages.scrollTo(0, messages.scrollHeight);
+<<<<<<< HEAD
 
+=======
+   
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
 });
 
 function sendChat() {
@@ -176,6 +207,7 @@ function sendChat() {
 }
 
 
+<<<<<<< HEAD
 socket.on('updateTimer', (timeLeft, over) => {
    if (!over) {
       gameTimer.classList.add('active');
@@ -188,3 +220,7 @@ socket.on('leaveRoom', (msg) => {
    alert(msg)
    window.location.href = '/'
 })
+=======
+
+export {socket}
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1

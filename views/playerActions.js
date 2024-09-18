@@ -45,6 +45,7 @@ socket.on('roundOver', (msg) => {
   if (winners.includes(msg[1])) {
     alert(`You win! ${msg[2]}`)
   } else {alert("You Lose. \n Player(s) " + msg[3] + " Win")}
+<<<<<<< HEAD
 })
 
 socket.on('roundOver2', (msg) => {
@@ -54,6 +55,8 @@ socket.on('roundOver2', (msg) => {
   else {
     alert(`Keep going you'll get it next time \n ${msg.winningStatement}`)
   }
+=======
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
 })
 
 socket.on('newRound', (cards) => {
@@ -115,6 +118,10 @@ function optOUT() {
 
 socket.on('optChoices', (reason) => {
   //if (reason == '<2') {prompt("Not Enough players for game to continue")}
+<<<<<<< HEAD
+=======
+  console.log("MAKE CHOICE")
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
   blurer.classList.add('active');
   optOutBTN.classList.add('active')
   optInBTN.classList.add('active')

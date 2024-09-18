@@ -26,6 +26,10 @@ function twoPlayerHandComparison(hands) {
   }
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
 
 //obsolete
 function arrayHandComparison(hands) {
@@ -87,6 +91,7 @@ function arrayHandComparison(hands) {
   return [winningHand]  //winningHandDescription;
 }
 
+<<<<<<< HEAD
 //Actual Function
 function handComparison(hands) {
   var values = [];
@@ -113,6 +118,51 @@ function handComparison(hands) {
     }
     console.log(winners)
     return winners // no
+=======
+function handComparison(hands) {
+  var values = [];
+  for (var i = 0; i < hands.length; i++) {
+    var currentHandValue = _handEvaluation.handEvaluation(hands[i].c, hands[i].p);
+    console.log(hands[i])
+    console.log(currentHandValue)
+    values.push(_handEvaluation.handEvaluation(hands[i].c, hands[i].p))
+  }
+  const max = values.sort((a,b)=>b.rank-a.rank)[0].rank;
+  const winners = values.filter(hand => hand.rank == max);
+  if (winners.length == 1 || max == 'Royal Flush') {
+    return winners;
+  }
+  else {
+    //if there is a tie, return the highest card
+    const maxCards = winners.sort((a,b)=>(b.cards[0]).v-(a.cards[0]).v)[0].cards[0].v;
+    const winners2 = winners.filter(hand => hand.cards[0].v == maxCards);
+    if (winners2.length == 1) {
+      return winners2
+    }
+    else {
+      if (winners2[0].cards.length > 1) {
+        //if there is still a tie, return the highest card
+        const maxCards2 = winners.sort((a,b)=>(b.cards[1]).v-(a.cards[1]).v)[0].cards[1].v;
+        const winners3 = winners.filter(hand => hand.cards[0].v == maxCards2);
+        if (winners3.length == 1) {
+          return winners3
+        } else {
+          const maxCards3 = winners.sort((a,b)=>(b.kicker).v-(a.kicker).v)[0].kicker.v;
+          const winners4 = winners.filter(hand => (hand.kicker).v == maxCards3);
+          return winners4 //if they are still tied its a draw
+        }
+      }
+      else {
+        //if there is still a tie, return the highest card
+        //console.log(winners[0].kicker.v)
+        //console.log(winners.sort((a,b)=>(b.kicker).v-(a.kicker).v)[0].kicker.v)
+        const maxCards3 = winners.sort((a,b)=>(b.kicker).v-(a.kicker).v)[0].kicker.v;
+        //console.log(winners.filter(hand => (hand.kicker).v == maxCards3))
+        const winners4 = winners.filter(hand => (hand.kicker).v == maxCards3);
+        return winners4 //if they are still tied its a draw
+      }
+    }
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
   }
 }
 

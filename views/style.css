@@ -1,6 +1,7 @@
 html {
   height: 100%;
   width: 100%;
+<<<<<<< HEAD
   background-color: #000;
 }
 .aspect-ratio-container {
@@ -8,11 +9,14 @@ html {
   aspect-ratio: 16 / 9;
   box-sizing: border-box;
   position: relative;
+=======
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
   background-image: url(Images/poker-table.jpg);
   background-repeat: no-repeat;
   background-size: cover;
 }
 
+<<<<<<< HEAD
 
 #menuBtnWrapper {
   position: absolute;
@@ -20,16 +24,27 @@ html {
   height: 30px;
 }
 
+=======
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
 .menuBTN {
   background-color: whitesmoke;
   border: solid 2px black;
   color: black;
+<<<<<<< HEAD
   width: 100%;
   height: 100%;
+=======
+  width: 104px;
+  height: 30px;
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
   text-align: left;
   font-size: 16px;
   cursor: pointer;
   position: absolute;
+<<<<<<< HEAD
+=======
+
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
   z-index: 10;
 }
 .menuBTN:hover, .contentBTN:hover, .menuBTN.hover{
@@ -43,14 +58,20 @@ html {
   width: 100px;
   height: 50px;
   opacity: 0;
+<<<<<<< HEAD
   visibility: hidden;
+=======
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
   z-index: 9;
   transition: 0.6s;
 }
 .wrapper.show {
   display: inline-block;
   opacity: 1;
+<<<<<<< HEAD
   visibility: visible;
+=======
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
   transform: translate(0, 28px);
   transition: 0.9s;
 }
@@ -75,6 +96,10 @@ html {
   border-radius: 5px;
   width: 150px;
   height: 40px;
+<<<<<<< HEAD
+=======
+  position: relative;
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
   transform: translate(-50%,-50%);
   left: 85%;
   display: inline-block;
@@ -133,17 +158,29 @@ html {
 }
 
 .card {
+<<<<<<< HEAD
   padding: 10px;
   width: 65px; /* Adjust as needed */
+=======
+  width: 100px;
+  height: 150px;
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
   background-color: white;
   border: 2px solid black;
   border-radius: 5px;
   position: absolute;
   transform: translate(-50%,-50%);
+<<<<<<< HEAD
   top: 50%;
   transition: 0.5s;
   z-index: 1;
   visibility: hidden;
+=======
+  top: 55%;
+  transition: 0.5s;
+  visibility: hidden;
+  z-index: 1;
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
 }
 
 #blurer {
@@ -190,11 +227,24 @@ html {
   left: 66%;
 }
 
+<<<<<<< HEAD
+=======
+#player1Card1 {
+  left: 46%;
+  top: 85%;
+}
+#player1Card2 {
+  left: 53%;
+  top: 85%;
+}
+
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
 #black-triangle {
   position: absolute;
   width: 20px;
   height: 20px;
   transform: translate(-50%,-50%);
+<<<<<<< HEAD
   left: 80%;
   top: 50%;
   z-index: 11;
@@ -210,6 +260,31 @@ html {
   transform-origin: center;
 }
 
+=======
+  left: 90px;
+  top: 23px;
+  z-index: 11;
+  transition: 0.4s;
+  cursor: pointer;
+}
+#black-triangle.rotate90 {
+  rotate: z 90deg;
+  transition: 0.6s;
+  left: 70px;
+}
+
+.rotate90Y {
+  rotate: y 90deg;
+  transform: translateY(-50%);
+  transition: 0.5s;
+}
+
+.active {
+  visibility: visible;
+}
+
+
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
 /* Chat button styles */
 #chat-btn {
   position: fixed;
@@ -288,6 +363,7 @@ html {
   background-color: #444;
 }
 
+<<<<<<< HEAD
 .player {
   visibility: hidden;
 }
@@ -351,6 +427,44 @@ html {
 #currentBet {
   top: -230%;
   left: 400%;
+=======
+#player2Card1 { top: 82%; left: 22%; rotate: 40deg;}
+
+#player2Card2 { top: 87%; left: 26%; rotate: 37deg;}
+
+#player3Card1 { left: 14%; top: 50%; rotate: 90deg;}
+
+#player3Card2 { left: 14%; top: 60%; rotate: 90deg;}
+
+#player4Card1 { left: 46%; top: 17%; rotate: 180deg; transform: translate(50%, 0%);}
+
+#player4Card2 { left: 53%; top: 17%; rotate: 180deg; transform: translate(50%, -0%);}
+
+#player5Card1 { top: 19%; left: 20%; rotate: 148deg; }
+
+#player5Card2 { top: 14%; left: 24%; rotate: 150deg; }
+
+#player6Card1 { top: 13%; left: 71%; rotate: 216deg;}
+
+#player6Card2 { top: 18%; left: 75%; rotate: 216deg;}
+
+#player7Card1 { left: 82%; top: 50%; rotate: -90deg;}
+
+#player7Card2 { left: 82%; top: 40%; rotate: -90deg;}
+
+#money {
+  top: 10%;
+  left: 80%;
+  position: absolute;
+  font-size: 50px;
+  background: white;
+  border: 2px solid black;
+  z-index: 4;
+}
+#currentBet {
+  top: 20%;
+  left: 80%;
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
   position: absolute;
   font-size: 30px;
   background: white;
@@ -358,8 +472,13 @@ html {
   z-index: 4;
 }
 #betted {
+<<<<<<< HEAD
   top: -190%;
   left: 400%;
+=======
+  top: 25%;
+  left: 80%;
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
   position: absolute;
   font-size: 30px;
   background: white;
@@ -416,7 +535,11 @@ html {
 #optInBTN {
   visibility: hidden;
   left: 50%;
+<<<<<<< HEAD
   top: 40%;
+=======
+  top: 20%;
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
   transform: translate(-50%, -0%);
   position: absolute;
   width: 150px;
@@ -427,7 +550,11 @@ html {
 #optOutBTN {
   visibility: hidden;
   left: 50%;
+<<<<<<< HEAD
   top: 50%;
+=======
+  top: 40%;
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
   transform: translate(-50%, -0%);
   position: absolute;
   width: 150px;
@@ -504,6 +631,7 @@ html {
   background: white;
   border: 2px solid black;
   z-index: 4;
+<<<<<<< HEAD
 }
 
 #createGame {
@@ -742,4 +870,6 @@ html {
 
 .active {
   visibility: visible;
+=======
+>>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
 }

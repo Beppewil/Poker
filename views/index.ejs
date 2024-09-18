@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Poker</title>
+    <link href="./style.css" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+
+    <div id="blurer"></div>
+    <div id="settingsBlurer"></div>
+
+    <div class="menu">
+        <button class="menuBTN" id="menuBTN">Menu</button>
+        <img src="./Images/black-triangle.png"id="black-triangle">
+        <div class="wrapper" id="wrapper">
+            <div class="content">
+                <button class="contentBTN" id="optionsBTN">Options</button>
+                <button class="contentBTN">Leave</button>
+            </div>
+        </div>
+        <!-- Chat button -->
+        <img id="chat-btn" src="./Images/chat.png" draggable="false">
+
+        <!-- Chat window -->
+        <div id="chat-window">
+        <!-- Chat messages -->
+        <ul id="messages"></ul>
+
+        <!-- Chat form -->
+        <div id="chat-form">
+            <input id="input" autocomplete="off" />
+            <button id="chat-send">Send</button>
+        </div>
+        </div>
+        <button id="playerOptions">Player Options</button> <!-- Player Options (kick/promote to leader/ BAN)-->
+        
+        <button id="player1options" class="playerOptionsBTN"></button>
+        <button id="player2options" class="playerOptionsBTN"></button>
+        <button id="player3options" class="playerOptionsBTN"></button>
+        <button id="player4options" class="playerOptionsBTN"></button>
+        <button id="player5options" class="playerOptionsBTN"></button>
+        <button id="player6options" class="playerOptionsBTN"></button>
+        <button id="player7options" class="playerOptionsBTN"></button>
+        <button id="player8options" class="playerOptionsBTN"></button>
+    </div>
+    
+
+    <div id="game">
+
+        <div id="pot">Pot: 0</div>
+
+        <div class="optChoices" id="optChoices">
+            <button id="optInBTN" >PLAY NEXT ROUND</button>
+            <button id="optOutBTN" >SIT OUT</button>
+        </div>
+        
+        <img id="arrow" src="./Images/red-arrow.png"></img>
+
+        <div id="communityCards">
+            <img src="" id="comCard1" class="card" draggable="false">
+            <img src="" id="comCard2" class="card" draggable="false">
+            <img src="" id="comCard3" class="card" draggable="false">
+            <img src="" id="comCard4" class="card" draggable="false">
+            <img src="" id="comCard5" class="card" draggable="false">
+        </div>
+
+        <div id="playerChoices" class="playerChoices active">
+            <button id="call" class="button">CALL/CHECK</button>
+            <button id="raise" class="button">RAISE</button>
+            <button id="fold" class="button">FOLD</button>
+        </div>
+
+        <div id="player" class="player">
+            <div id="money">Money: 1000</div>
+            <div id="betted">Betted: 0</div>
+            <div id="currentBet">Current Bet: 0</div>
+            
+            <img src="" id="player1Card1" class="card" draggable="false">
+            <img src="" id="player1Card2" class="card" draggable="false">
+        </div>
+
+        <div id="player2" class="player">
+            <img src="./Images/Playing Cards/PNG-cards-1.3/cardBack.png" id="player2Card1" class="card " draggable="false">
+            <img src="./Images/Playing Cards/PNG-cards-1.3/cardBack.png" id="player2Card2" class="card " draggable="false">
+        </div>
+
+        <div id="player3" class="player">
+            <img src="./Images/Playing Cards/PNG-cards-1.3/cardBack.png" id="player3Card1" class="card " draggable="false">
+            <img src="./Images/Playing Cards/PNG-cards-1.3/cardBack.png" id="player3Card2" class="card " draggable="false">
+        </div>
+
+        <div id="player4" class="player">
+            <img src="./Images/Playing Cards/PNG-cards-1.3/cardBack.png" id="player4Card1" class="card " draggable="false">
+            <img src="./Images/Playing Cards/PNG-cards-1.3/cardBack.png" id="player4Card2" class="card " draggable="false">
+        </div>
+
+        <div id="player5" class="player">
+            <img src="./Images/Playing Cards/PNG-cards-1.3/cardBack.png" id="player5Card1" class="card " draggable="false">
+            <img src="./Images/Playing Cards/PNG-cards-1.3/cardBack.png" id="player5Card2" class="card " draggable="false">
+        </div>
+
+        <div id="player6" class="player">
+            <img src="./Images/Playing Cards/PNG-cards-1.3/cardBack.png" id="player6Card1" class="card " draggable="false">
+            <img src="./Images/Playing Cards/PNG-cards-1.3/cardBack.png" id="player6Card2" class="card " draggable="false">
+        </div>
+
+        <div id="player7" class="player">
+            <img src="./Images/Playing Cards/PNG-cards-1.3/cardBack.png" id="player7Card1" class="card " draggable="false">
+            <img src="./Images/Playing Cards/PNG-cards-1.3/cardBack.png" id="player7Card2" class="card " draggable="false">
+        </div>
+    </div>
+
+
+
+
+    <script src="./script.js" type="module"></script>
+    <script src="./menuActions.js" type="module"></script>
+    <script src="./playerActions.js" type="module"></script>
+
+
+
+</body>
+
+</html>
