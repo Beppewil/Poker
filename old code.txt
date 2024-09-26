@@ -9,7 +9,6 @@ function filterProfanity(msg){
     }
     else {filteredMessage += (balls[ball]) + ' '}
   }
-<<<<<<< HEAD
 }
 
 
@@ -220,6 +219,3 @@ socket.on('updatePlayerList', (playerList, playerNumber) => {
       })
    }
 })
-=======
-}
->>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1

@@ -8,6 +8,8 @@ var raise = document.getElementById("raise")
 raise.addEventListener("click", _raise)
 var fold = document.getElementById("fold")
 fold.addEventListener("click", _fold)
+const hideCards = document.getElementById('hideCards')
+hideCards.addEventListener('click', _hideCards)
 
 var optInBTN = document.getElementById("optInBTN")
 optInBTN.addEventListener('click', optIN) 
@@ -17,6 +19,7 @@ var optChoices = document.getElementById("optChoices")
 
 var currentBet = document.getElementById('currentBet')
 var betted = document.getElementById('betted')
+let playersCards;
 
 function _call() {
   socket.emit('playerBet', ['call', 0])
@@ -36,8 +39,20 @@ socket.on('nextCards', (cards) => {
 })
 
 socket.on('dealCards', (cards) => {
+  playersCards = cards
   script.HTMLCardDisplay(cards, 'player1Card')
 })
+
+function _hideCards() {
+  if (document.getElementById('player1Card1').src != null) {
+    console.log(document.getElementById('player1Card1').src)
+    console.log(playersCards)
+    if (document.getElementById('player1Card1').src.includes('cardBack.png')) {
+      script.HTMLCardDisplay(playersCards, 'player1Card')
+    }
+    else {script.HTMLCardDisplay('back', 'player1Card')}
+  } else return;
+}
 
 socket.on('roundOver', (msg) => {
   var winners = []
@@ -45,7 +60,6 @@ socket.on('roundOver', (msg) => {
   if (winners.includes(msg[1])) {
     alert(`You win! ${msg[2]}`)
   } else {alert("You Lose. \n Player(s) " + msg[3] + " Win")}
-<<<<<<< HEAD
 })
 
 socket.on('roundOver2', (msg) => {
@@ -55,8 +69,6 @@ socket.on('roundOver2', (msg) => {
   else {
     alert(`Keep going you'll get it next time \n ${msg.winningStatement}`)
   }
-=======
->>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
 })
 
 socket.on('newRound', (cards) => {
@@ -118,10 +130,6 @@ function optOUT() {
 
 socket.on('optChoices', (reason) => {
   //if (reason == '<2') {prompt("Not Enough players for game to continue")}
-<<<<<<< HEAD
-=======
-  console.log("MAKE CHOICE")
->>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
   blurer.classList.add('active');
   optOutBTN.classList.add('active')
   optInBTN.classList.add('active')
@@ -146,7 +154,4 @@ socket.on('playerBet', (bet) => {
 socket.on('updatePot', (pot) => {
   document.getElementById('pot').innerHTML = `Pot: ${pot}`
 })
-//on playerJoin 
-//create new div 'player'+i 
-//make css styles for each player 2-8 
 //yippee

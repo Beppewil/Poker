@@ -53,23 +53,23 @@ class PokerGame {
       const index = this.playerTurn.indexOf(this.players[socketId].playerNum);
       
       if (index < i) {
-        i--;
+        this.i--;
       } //if the player who leaves was before the current move i back so that player doesnt lose their turn
-      if (index > -1) {
-        // only splice array when item is found
-        this.playerTurn.splice(index, 1); 
-      }
       if (i > this.playerTurn.length - 1) {
-        i = 0;
+        this.i = 0;
       }
+      this.playerTurn = [];
       for (let player in this.players) {if (this.players[player].playerNum > this.players[socketId].playerNum) {this.players[player].playerNum--}}
       this.playerList.splice(this.playerList.findIndex((obj) => obj.n === this.players[socketId].username), 1);
       this.playerList.forEach(player => {
         if (player.p > this.players[socketId].playerNum) {
           player.p--
         }
+        if (player.playing && !player.folded) {
+          this.playerTurn.push(player.p)
+        }
       })
-      this.playerTurn = this.playerTurn.map(e => e - 1);
+
       delete this.players[socketId];
   
       for (let p in this.players) { 
@@ -128,6 +128,7 @@ class PokerGame {
           this.players[player].money -=
             this.blindValue * (this.playerTurn.indexOf(this.players[player].playerNum) + 1);
           this.players[player].roundBet = this.blindValue * (this.playerTurn.indexOf(this.players[player].playerNum) + 1);   
+          this.players[player].totalbet  = this.blindValue * (this.playerTurn.indexOf(this.players[player].playerNum) + 1);
           this.pot += this.blindValue * (this.playerTurn.indexOf(this.players[player].playerNum) + 1);
           this.players[player].socket.emit("updateMoney", this.players[player].money);
           this.players[player].socket.emit("playerBet",  this.blindValue * (this.playerTurn.indexOf(this.players[player].playerNum) + 1));
@@ -171,7 +172,7 @@ class PokerGame {
       }
 
       console.log(player.bet, player.money, betType, player.roundBet, this.currentBet)
-      if (player.money >= player.bet && player.bet >= 0) {
+      if (player.money >= player.bet && player.bet >= 0 && player.money > 0) {
         
         if (betType === 'call') {
             player.money -= player.bet;
@@ -200,12 +201,19 @@ class PokerGame {
           this.playerTurn.splice(this.playerTurn.indexOf(this.players[socketId].playerNum),1)
           player.lastAction = `Folded`
           this.i--;
-          if (this.playerList.length == 1) {this._allBetted(true)}
         }
       } else {if(betType == 'raise'){player.betted = true, this.pot += player.money, player.totalbet = player.maxWin, player.money = 0, player.lastAction = "All in"}else console.log("insufficient funds to match"), player.betted = true, player.totalbet = player.maxWin, this.pot += player.money, player.money = 0, player.lastAction = "Called (insufficient funds)"}
 
+
+      console.log(this.playerTurn, this.playerTurn.length === 1)
       if (this.i < this.playerTurn.length - 1) {
         this.i++;
+        var hasMoney = false
+        while (hasMoney == false) {
+          if (Object.keys(this.players).filter(key => this.players[key].username == this.playerList[this.playerTurn[i]].username).money == 0) {
+            this.i++
+          } else hasMoney = true;
+        }
       } else {
         this.i = 0;
       }
@@ -217,7 +225,7 @@ class PokerGame {
       player.bet = 0;
       player.socket.emit('playerBet', this.players[socketId].roundBet)
       this.io.to(this.roomID).emit("updatePot", this.pot);
-      if (this.checkAllBetted()) {
+      if (this.checkAllBetted() || this.playerTurn.length < 2) {
         this._allBetted();
         this.currentBet = 0;
         this.i = 0;
@@ -296,7 +304,7 @@ class PokerGame {
   }
   
   _allBetted(allFolded) {
-    if (!allFolded) {
+    if (this.playerTurn.length > 1) {
       if (this.comCards.length < 3) {
         this.comCards.push(...this.deck.splice(0, 3));
         this.io.to(this.roomID).emit("nextCards", this.comCards);
@@ -304,7 +312,10 @@ class PokerGame {
         this.comCards.push(...this.deck.splice(0, 1));
         this.io.to(this.roomID).emit("nextCards", this.comCards);
       } else {this.roundEnd()}
-    } else {this.roundEnd()}
+    } else {
+      this.comCards.push(...this.deck.splice(0, 5 - this.comCards.length))
+      this.roundEnd()
+    }
   }
 
   roundEnd() {
@@ -334,27 +345,6 @@ class PokerGame {
       }
     }
 
-    /* Old winner logic with no sidepots
-    if (comparisonArray.length > 1) {
-      var winner = _handComparison.handComparison(comparisonArray);
-      var winners = [];
-      var winnersUsernames = [];
-      winner.forEach(p => {
-        winners.push(p.player)
-      })
-      for (let player in this.players) {
-        if (winners.includes(this.players[player].playerNum)) {winnersUsernames.push("'"+this.players[player].username+"'")}
-      }
-    } else {
-      for (let player in this.players) {
-        if (this.players[player].folded == false) {
-          var winners = [this.players[player].playerNum];
-          var winnersUsernames = [this.players[player].username]
-        }
-      }
-    }
-    */
-
     //added sidepots
     var sidePlayers = []; // only include players that are playing
     for (let player in this.players) {
@@ -366,19 +356,21 @@ class PokerGame {
 
     var sidepots = []
 
-    for (let i = 0; i < Object.keys(sidePlayers).length; i++) {
-      if (i !=  Object.keys(sidePlayers).length - 1) {
-        if (sidePlayers[i].totalbet < sidePlayers[i + 1].totalbet) {
-          var elligablePlayers = []
-          for (let e = i; e < Object.keys(sidePlayers).length; e++) {
-            elligablePlayers.push(sidePlayers[e])
+    if (sidepots.length > 1) {
+      for (let i = 0; i < Object.keys(sidePlayers).length; i++) {
+        if (i !=  Object.keys(sidePlayers).length - 1) {
+          if (sidePlayers[i].totalbet < sidePlayers[i + 1].totalbet) {
+            var elligablePlayers = []
+            for (let e = i; e < Object.keys(sidePlayers).length; e++) {
+              elligablePlayers.push(sidePlayers[e])
+            }
+            sidepots.push( { pot: sidePlayers[i].totalbet * Object.keys(this.players).filter(player => this.players[player].totalbet >= sidePlayers[i].totalbet).length, players: elligablePlayers } );
           }
-          sidepots.push( { pot: sidePlayers[i].totalbet * Object.keys(this.players).filter(player => this.players[player].totalbet >= sidePlayers[i].totalbet).length, players: elligablePlayers } );
         }
-      }
-      else {
-        if (sidePlayers[i].totalbet > sidePlayers[i-1].totalbet) {
-          this.players[sidePlayers[i].socket.id].money +=  sidePlayers[i].totalbet - sidePlayers[i-1].totalbet;
+        else {
+          if (sidePlayers[i].totalbet > sidePlayers[i-1].totalbet) {
+            this.players[sidePlayers[i].socket.id].money +=  sidePlayers[i].totalbet - sidePlayers[i-1].totalbet;
+          }
         }
       }
     }
@@ -389,12 +381,14 @@ class PokerGame {
 
     for (let sidepot in sidepots) {
       var elligablePlayers = []
-      winningStatement +=  "Sidepot " + (parseInt(sidepots[sidepot].pot)) + " winners: "
+      console.log(sidepot)
+      if (sidepot == 0) {winningStatement +=  "Main Pot " + (parseInt(sidepots[sidepot].pot)) + " winners: "}
+      else {winningStatement +=  "Sidepot " + (parseInt(sidepots[sidepot].pot)) + " winners: ";}
+
       for  (let player in sidepots[sidepot].players) { 
         elligablePlayers.push({c: sidepots[sidepot].players[player].hand, p: sidepots[sidepot].players[player].playerNum, n: sidepots[sidepot].players[player].username});
       }
       var sidepotWinner = _handComparison.handComparison(elligablePlayers)
-      console.log("Sidepot WInners", sidepotWinner)
     
       for (let winner of sidepotWinner) { //Seems silly but done so cant trick the code by making name = the name of the hand 
         for (let player in this.players) {

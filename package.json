@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "devStart": "nodemon index.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
@@ -14,18 +14,10 @@
     "@types/node": "^18.0.6",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
-<<<<<<< HEAD
     "http": "^0.0.1-security",
     "nodemon": "^3.1.4",
     "socket.io": "^4.7.5",
     "socketio": "^1.0.0",
     "uuid": "^10.0.0"
-=======
-    "socket.io": "^4.7.5",
-    "uuid": "^10.0.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.4"
->>>>>>> f806904bd851b7597dbfa53e54e558e18e7cc7d1
   }
 }
