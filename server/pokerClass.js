@@ -204,16 +204,8 @@ class PokerGame {
         }
       } else {if(betType == 'raise'){player.betted = true, this.pot += player.money, player.totalbet = player.maxWin, player.money = 0, player.lastAction = "All in"}else console.log("insufficient funds to match"), player.betted = true, player.totalbet = player.maxWin, this.pot += player.money, player.money = 0, player.lastAction = "Called (insufficient funds)"}
 
-
-      console.log(this.playerTurn, this.playerTurn.length === 1)
       if (this.i < this.playerTurn.length - 1) {
         this.i++;
-        var hasMoney = false
-        while (hasMoney == false) {
-          if (Object.keys(this.players).filter(key => this.players[key].username == this.playerList[this.playerTurn[i]].username).money == 0) {
-            this.i++
-          } else hasMoney = true;
-        }
       } else {
         this.i = 0;
       }
