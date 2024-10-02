@@ -65,7 +65,7 @@ class PokerGame {
         if (player.p > this.players[socketId].playerNum) {
           player.p--
         }
-        if (player.playing && !player.folded) {
+        if (player.playing && !player.folded && player.money > 0) {
           this.playerTurn.push(player.p)
         }
       })
@@ -111,7 +111,7 @@ class PokerGame {
     this.playerCards = [];
     
     for (let player in this.players) {
-      if (this.players[player].playing == true && this.players[player].money > this.blindValue * 2) {
+      if (this.players[player].playing == true && this.players[player].money >= this.blindValue * 2) {
         this.playerTurn.push(this.players[player].playerNum)
       }
     }
@@ -185,7 +185,8 @@ class PokerGame {
             player.money -= player.bet - player.roundBet;
             this.pot += player.bet;
             player.roundBet += player.bet - player.roundBet;
-            this.currentBet += amount;
+            console.log(player.roundBet)
+            this.currentBet = parseInt(player.roundbet);
             player.betted = true;
             player.lastAction = `Raised to £${player.roundBet}`
             player.totalbet += player.bet;
@@ -193,6 +194,7 @@ class PokerGame {
               if (p != socketId && this.players[p].folded == false && this.players[socketId].bet != 0) {
                 this.players[p].betted = false;
               }
+              console.log(this.currentBet)
             this.players[p].socket.emit("updateBet", [this.players[p].betted, this.currentBet]);
             }
         } else if (betType === 'fold') {
@@ -202,18 +204,16 @@ class PokerGame {
           player.lastAction = `Folded`
           this.i--;
         }
-      } else {if(betType == 'raise'){player.betted = true, this.pot += player.money, player.totalbet = player.maxWin, player.money = 0, player.lastAction = "All in"}else console.log("insufficient funds to match"), player.betted = true, player.totalbet = player.maxWin, this.pot += player.money, player.money = 0, player.lastAction = "Called (insufficient funds)"}
+      } else {
+        if (betType == 'raise'){player.betted = true, this.pot += player.money, player.totalbet = player.maxWin, player.money = 0, player.lastAction = "All in"}
+        else {console.log("insufficient funds to match"), player.betted = true, player.totalbet = player.maxWin, this.pot += player.money, player.money = 0, player.lastAction = "All in"}
+        this.playerTurn.splice(this.i, 1)
+        this.i--;
+      }
 
 
-      console.log(this.playerTurn, this.playerTurn.length === 1)
       if (this.i < this.playerTurn.length - 1) {
         this.i++;
-        var hasMoney = false
-        while (hasMoney == false) {
-          if (Object.keys(this.players).filter(key => this.players[key].username == this.playerList[this.playerTurn[i]].username).money == 0) {
-            this.i++
-          } else hasMoney = true;
-        }
       } else {
         this.i = 0;
       }
@@ -303,8 +303,8 @@ class PokerGame {
     }
   }
   
-  _allBetted(allFolded) {
-    if (this.playerTurn.length > 1) {
+  _allBetted() {
+    if (this.playerTurn.length > 1 && Object.keys(this.players).filter(key => this.players[key].money > 0).length > 1) {
       if (this.comCards.length < 3) {
         this.comCards.push(...this.deck.splice(0, 3));
         this.io.to(this.roomID).emit("nextCards", this.comCards);
