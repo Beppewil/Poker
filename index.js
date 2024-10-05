@@ -1,133 +1,186 @@
+// Import required modules
 const PokerGame = require('./server/pokerClass.js');
-
 const profanity = require('@2toad/profanity').profanity;
-
 const express = require("express");
 const app = express();
 const port = 25565;
 
-// socket.io setup
+// Set up socket.io
 const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
-const { v4: uuidV4} = require('uuid');
+const { v4: uuidV4 } = require('uuid');
 
-const lobbiesIDs = [];
-const lobbiesNumber = [];
-const lobbies = {};
+// Initialize variables to store lobby information
+var lobbiesIDs = [];
+var lobbiesNumber = [];
+var lobbies = {};
 var LOBBY_ID = '';
 
+// Set up Express.js
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("views"));
 
+// Serve static files from the 'views' directory
 app.use('/views', express.static('views', {
   setHeaders: (res, path) => {
+    // Set the Content-Type header for CSS files
     if (path.endsWith('.css')) {
       res.set("Content-Type", "text/css");
     }
   }
-})); //Blackjack/:room doesnt work without this
+}));
 
+// Handle GET request to the root URL
 app.get("/", function (req, res) {
-  if (req.headers['user-agent'].match(/Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i) !== null) {res.render("mobile", {mobile: true});}
-  else {
+  // Check if the user is accessing the site from a mobile device
+  if (req.headers['user-agent'].match(/Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i) !== null) {
+    // Render the mobile version of the site
+    res.render("mobile", { mobile: true });
+  } else {
+    // Render the home page with a list of available lobbies
     res.render(`home`, { lobbiesIDs })
   }
 });
 
+// Handle GET request to a specific blackjack room
 app.get('/blackjack/:room', function (req, res) {
+  // Render the blackjack page with the room ID
   res.render('blackjack', { room: req.params.room })
 })
 
+// Handle POST request to join a lobby
 app.post('/', (req, res) => {
-  const lobbyId = req.body.lobbyId; // Get the lobby ID from the hidden input field
-
-  console.log(lobbies)
-  res.redirect(`/${lobbies[lobbiesNumber[lobbyId]].roomID}`)
+  // Get the lobby ID from the hidden input field
+  const lobbyId = req.body.lobbyId;
+  console.log(lobbyId)
+  console.log(lobbiesNumber)
+  //console.log(lobbies[lobbiesNumber[lobbyId]])
+  // Redirect the user to the lobby page
+  res.redirect(`/${lobbiesNumber[lobbyId]}`)
 });
 
+// Handle POST request to create a new lobby
 app.post("/createLobby", function (req, res) {
+  // Generate a unique ID for the lobby
   LOBBY_ID = uuidV4();
-  lobbiesIDs.push({id: lobbiesIDs.length, name: req.body.gameName, blind: req.body.blindValue, players: 0, private: req.body.privateCheckbox == 'true' })
+
+  // Add the lobby to the list of available lobbies
+  lobbiesIDs.push({ id: lobbiesIDs.length, name: req.body.gameName, blind: req.body.blindValue, players: 0, private: req.body.privateCheckbox == 'true' })
   lobbiesNumber.push(LOBBY_ID)
-  // If no game exists for this room, create a new one
+  console.log(LOBBY_ID)
+
+  // Create a new PokerGame instance for the lobby
   if (!lobbies[LOBBY_ID]) {
-    if(req.body.privateCheckbox == 'true') {lobbies[LOBBY_ID] = new PokerGame(io, LOBBY_ID, Math.floor(req.body.blindValue), req.body.gamePassword, lobbiesNumber.length - 1);}
-    else {lobbies[LOBBY_ID] = new PokerGame(io, LOBBY_ID, Math.floor(req.body.blindValue), null, lobbiesNumber.length - 1);}
+    if (req.body.privateCheckbox == 'true') {
+      lobbies[LOBBY_ID] = new PokerGame(io, LOBBY_ID, Math.floor(req.body.blindValue), req.body.gamePassword, lobbiesNumber.length - 1);
+    } else {
+      lobbies[LOBBY_ID] = new PokerGame(io, LOBBY_ID, Math.floor(req.body.blindValue), null, lobbiesNumber.length - 1);
+    }
+    console.log(lobbies[LOBBY_ID])
   }
+
+  // Emit a 'newButton' event to update the lobby list
   io.emit('newButton', lobbiesIDs, req.body.gameName);
+
+  // Redirect the user to the lobby page
   res.redirect(`/${LOBBY_ID}`)
 });
 
+// Handle GET request to a specific lobby
 app.get("/:room", function (req, res) {
-  res.render("poker", {room: req.params.room});
+  // Render the poker page with the room ID
+  res.render("poker", { room: req.params.room });
 })
 
-
-
+// Set up socket.io event listeners
 io.on("connection", (socket) => {
-
+  // Handle 'joinPrivateLobby' event
   socket.on('joinPrivateLobby', (lobbyNum, password) => {
-    if (lobbies[lobbiesNumber[lobbyNum]].password == password) {socket.emit('joinAttempt', lobbies[lobbiesNumber[lobbyNum]].roomID)}
-    else {socket.emit('joinAttempt', null)}
-  })
-  
-
-  socket.on('joinRoom', (roomId) => {    
-    if (!lobbies[roomId]) {
-    socket.emit('leaveRoom', "Room Doesnt Exist")
+    // Check if the password is correct
+    if (lobbies[lobbiesNumber[lobbyNum]].password == password) {
+      // Emit a 'joinAttempt' event with the room ID
+      socket.emit('joinAttempt', lobbies[lobbiesNumber[lobbyNum]].roomID)
     } else {
+      // Emit a 'joinAttempt' event with a null room ID
+      socket.emit('joinAttempt', null)
+    }
+  })
 
-    if (lobbies[roomId].NoOfPlayers < 8) {
-    
-      console.log(`User joined room ${roomId}`);
-      socket.data.room = roomId; // Store room on the socket
-      socket.join(roomId);
-  
-      lobbies[roomId].addPlayer(socket, 'Player', 1000);
-        
-      const lobbyIndex = lobbiesNumber.indexOf(roomId)
-      if (lobbyIndex !== -1) {
-        lobbiesIDs[lobbyIndex].players++;
+  // Handle 'joinRoom' event
+  socket.on('joinRoom', (roomId) => {
+    // Check if the room exists
+    if (!lobbies[roomId]) {
+      // Emit a 'leaveRoom' event with an error message
+      socket.emit('leaveRoom', "Room Doesnt Exist")
+    } else {
+      // Check if the room is full
+      if (lobbies[roomId].NoOfPlayers < 8) {
+        // Add the user to the room
+        console.log(`User joined room ${roomId}`);
+        socket.data.room = roomId; // Store room on the socket
+        socket.join(roomId);
+
+        // Add the user to the game
+        lobbies[roomId].addPlayer(socket, 'Player', 1000);
+
+        // Update the lobby list
+        const lobbyIndex = lobbiesNumber.indexOf(roomId)
+        if (lobbyIndex !== -1) {
+          lobbiesIDs[lobbyIndex].players++;
+        }
+
+        // Emit an 'updatePlayerList' event to update the player list
+        for (let p in lobbies[socket.data.room].players) {
+          lobbies[roomId].players[p].socket.emit('updatePlayerList', lobbies[roomId].getPlayers(), lobbies[roomId].players[p].playerNum)
+        }
+
+        // Emit an 'optChoices' event to prompt the user to make a choice
+        if (lobbies[roomId].gameStarted == false) {
+          socket.emit('optChoices', 'cards');
+        }
+
+        // Emit a 'playerJoin' event to confirm the user's join
+        socket.emit('playerJoin', '');
+      } else {
+        // Emit a 'leaveRoom' event with an error message
+        socket.emit('leaveRoom', "Room Full")
       }
-      for (let p in lobbies[socket.data.room].players) { 
-        lobbies[roomId].players[p].socket.emit('updatePlayerList', lobbies[roomId].getPlayers(), lobbies[roomId].players[p].playerNum)
-      }
-  
-      if (lobbies[roomId].gameStarted == false) {socket.emit('optChoices', 'cards');}
-      
-  
-      socket.emit('playerJoin', '');
-      } else {socket.emit('leaveRoom', "Room Full")}
     }
   });
-  //Joining and leaving
-  console.log("a user connected");
 
-  
-  
+  // Handle 'usernameEntered' event
   socket.on('usernameEntered', (username) => {
+    // Check if the username is available and does not contain profanity
     if (lobbies[socket.data.room] != null) {
-    if (lobbies[socket.data.room].playerList.filter(player => player.n == username).length == 0 && !profanity.exists(username)) {
-      const playerIndex = lobbies[socket.data.room].playerList.findIndex(player => player.p == lobbies[socket.data.room].players[socket.id].playerNum);
-      lobbies[socket.data.room].playerList[playerIndex].n = username;
+      if (lobbies[socket.data.room].playerList.filter(player => player.n == username).length == 0 && !profanity.exists(username)) {
+        // Update the player's username
+        const playerIndex = lobbies[socket.data.room].playerList.findIndex(player => player.p == lobbies[socket.data.room].players[socket.id].playerNum);
+        lobbies[socket.data.room].playerList[playerIndex].n = username;
         lobbies[socket.data.room].players[socket.id].username = username;
 
-      for (let p in lobbies[socket.data.room].players) { 
-        lobbies[socket.data.room].players[p].socket.emit('updatePlayerList', lobbies[socket.data.room].getPlayers(), lobbies[socket.data.room].players[p].playerNum)
+        // Emit an 'updatePlayerList' event to update the player list
+        for (let p in lobbies[socket.data.room].players) {
+          lobbies[socket.data.room].players[p].socket.emit('updatePlayerList', lobbies[socket.data.room].getPlayers(), lobbies[socket.data.room].players[p].playerNum)
+        }
+      } else {
+        // Emit a 'playerJoin' event with an error message
+        socket.emit('playerJoin', 'Sorry Username Is Taken or Contains Profanity ')
       }
-    } else (socket.emit('playerJoin', 'Sorry Username Is Taken or Contains Profanity '))
     }
   })
 
+  // Handle 'playerKick' event
   socket.on('playerKick', (player) => {
+    // Check if the user has permission to kick the player
     var kicked = false;
     if (socket.data.room != null) {
       if (lobbies[socket.data.room].players[socket.id].playerNum == 1) {
+        // Find the player to kick and remove them from the game
         for (let p in lobbies[socket.data.room].players) {
-          if(lobbies[socket.data.room].players[p].playerNum == player && kicked == false) {
+          if (lobbies[socket.data.room].players[p].playerNum == player && kicked == false) {
             lobbies[socket.data.room].players[p].socket.emit('leaveRoom', 'You Have Been Kicked')
             lobbies[socket.data.room].removePlayer(p, lobbies[socket.data.room].i);
             kicked = true;
@@ -137,58 +190,82 @@ io.on("connection", (socket) => {
     }
   })
 
+  // Handle 'optIN' event
   socket.on('optIN', (vote) => {
+    // Check if the game is active
     if (lobbies[socket.data.room]) {
+      // Update the player's vote
       lobbies[socket.data.room].playerOptIn(socket.id, vote);
     }
   })
 
+  // Handle 'leaveRoom' event
   socket.on('leaveRoom', () => {
+    // Check if the user is in a room
     if (lobbies[socket.data.room]) {
+      // Remove the user from the room
       console.log(`User left room ${socket.data.room}`);
       socket.leave(socket.data.room);
       lobbies[socket.data.room].removePlayer(socket.id, lobbies[socket.data.room].i);
-      for (let p in lobbies[socket.data.room].players) { 
-        lobbies[socket.data.room].players[p].socket.emit('updatePlayerList', lobbies[socket.data.room].getPlayers(), lobbies[socket.data.room].players[p].playerNum)
-      }
+
+      // Update the lobby list
       const lobbyIndex = lobbies[socket.data.room].lobbyNum;
       console.log(lobbyIndex)
       if (lobbyIndex != -1) {
         lobbiesIDs[lobbyIndex].players--;
       }
+
+      // Emit an 'updatePlayerList' event to update the player list
+      for (let p in lobbies[socket.data.room].players) {
+        lobbies[socket.data.room].players[p ].socket.emit('updatePlayerList', lobbies[socket.data.room].getPlayers(), lobbies[socket.data.room].players[p].playerNum)
+      }
+
+      // Reset the user's room data
       socket.data.room = null;
     }
   })
 
+  // Handle 'disconnect' event
   socket.on("disconnect", (reason) => {
+    // Check if the user is in a room
     console.log(`${socket.id} disconnected (${reason})`);
     if (socket.data.room != null) {
+      // Remove the user from the room
       lobbies[socket.data.room].removePlayer(socket.id, lobbies[socket.data.room].i);
       socket.leave(socket.data.room); // Leave the room on disconnect
+
+      // Update the lobby list
       const lobbyIndex = lobbies[socket.data.room].lobbyNum;
       console.log(lobbyIndex)
       if (lobbyIndex != -1) {
         lobbiesIDs[lobbyIndex].players--;
       }
+
+      // Reset the user's room data
       socket.data.room = null;
     }
   });
 
-  //Chat
+  // Handle 'chat message' event
   socket.on("chat message", (msg) => {
+    // Check if the user is in a room
     if (lobbies[socket.data.room]) {
+      // Emit a 'chat message' event to all users in the room
       io.to(socket.data.room).emit("chat message", [lobbies[socket.data.room].players[socket.id].username, profanity.censor(msg)]);
     }
   });
 
-  //Player Betting
+  // Handle 'playerBet' event
   socket.on("playerBet", (betType) => {
+    // Check if the user is in a room
     if (lobbies[socket.data.room]) {
+      // Update the player's bet
       lobbies[socket.data.room].playerBet(socket.id, betType[0], betType[1]);
     }
   });
 });
 
+// Start the server
 server.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });

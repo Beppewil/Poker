@@ -32,8 +32,8 @@
         <div>Small Blind: <%= lobbiesIDs[i-1].blind %></div>
         <div id="PlayerCount">Players: <%= lobbiesIDs[i-1].players %>/8</div>
         <div id="joinPrivate" value="<%=lobbiesIDs[i-1].private %>" >Private: <%= lobbiesIDs[i-1].private %> </div>
-        <input type="hidden" name="lobbyId" value="<%=lobbiesIDs[i-1].id%>">
-        <button type="submit" name="joinLobby" id="joinLobby" value="<%=lobbiesIDs[i-1].id%>" class="joinButton">Join Lobby</button>
+        <input type="hidden" name="lobbyId_<%=lobbiesIDs[i-1].id%>" value="<%=lobbiesIDs[i-1].id%>">
+        <button type="submit" name="joinLobby_<%=lobbiesIDs[i-1].id%>" id="joinLobby" value="<%=lobbiesIDs[i-1].id%>" class="joinButton">Join Lobby</button>
       </div>
     <% } %>
   </form>
@@ -86,6 +86,8 @@
 
     
     const joinLobbyButtons = document.querySelectorAll('.joinButton');
+    const lobbyForm = document.getElementById('lobbyForm');
+
     joinLobbyButtons.forEach(button => {
       button.addEventListener('click', (e) => {
         e.preventDefault();
@@ -95,7 +97,12 @@
           const password = prompt("Enter password for this private lobby:");
           socket.emit('joinPrivateLobby', lobbyId, password)
         } else {
-          document.getElementById('lobbyForm').submit();
+          const hiddenInput = document.createElement('input');
+          hiddenInput.type = 'hidden';
+          hiddenInput.name = 'lobbyId';
+          hiddenInput.value = lobbyId;
+          lobbyForm.appendChild(hiddenInput);
+          lobbyForm.submit();
         }
       });
     });
