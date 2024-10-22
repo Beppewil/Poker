@@ -71,7 +71,8 @@ class PokerGame {
       })
 
       delete this.players[socketId];
-  
+      this.NoOfPlayers--; 
+
       for (let p in this.players) { 
         this.players[p].socket.emit('updatePlayerList', this.getPlayers(), this.players[p].playerNum)
       }
