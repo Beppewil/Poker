@@ -75,9 +75,9 @@ app.post("/createLobby", function (req, res) {
   // Create a new PokerGame instance for the lobby
   if (!lobbies[LOBBY_ID]) {
     if (req.body.privateCheckbox == 'true') {
-      lobbies[LOBBY_ID] = new PokerGame(io, LOBBY_ID, Math.floor(req.body.blindValue), req.body.gamePassword, lobbiesNumber.length - 1);
+      lobbies[LOBBY_ID] = new PokerGame(io, LOBBY_ID, Math.floor(Math.abs(req.body.blindValue)), req.body.gamePassword, lobbiesNumber.length - 1);
     } else {
-      lobbies[LOBBY_ID] = new PokerGame(io, LOBBY_ID, Math.floor(req.body.blindValue), null, lobbiesNumber.length - 1);
+      lobbies[LOBBY_ID] = new PokerGame(io, LOBBY_ID, Math.floor(Math.abs(req.body.blindValue)), null, lobbiesNumber.length - 1);
     }
     console.log(lobbies[LOBBY_ID])
   }

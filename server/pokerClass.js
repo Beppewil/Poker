@@ -226,7 +226,7 @@ class PokerGame {
       player.bet = 0;
       player.socket.emit('playerBet', this.players[socketId].roundBet)
       this.io.to(this.roomID).emit("updatePot", this.pot);
-      if (this.checkAllBetted() || this.playerTurn.length < 2) {
+      if (this.checkAllBetted() || this.playerTurn.length < 1) {
         this._allBetted();
         this.currentBet = 0;
         this.i = 0;
