@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style="background: gray;">
+<html lang="en" id="htmlpage" style="background-color: gray;">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -14,6 +14,15 @@
   </script>
   
   <h1 id="pokerTitle">Poker</h1>
+  
+  <!-- Toggle Switch -->
+  <div class="toggle-container">
+    <input type="checkbox" id="colorToggle" class="toggle">
+    <label for="colorToggle" class="toggle-label"></label>
+  </div>
+
+  
+  <button id="createGameBackButton"><</button>
   <button id="createGame">Create Game</button>
   <form action="/createLobby" method="post" id="createGameForm" class="">
     <br><br><div class="inputLabel">Game Name:</div><br><br>
@@ -26,30 +35,36 @@
     <button type="submit" id="submitForm">Create Game</button>
   </form>  
 
-  <form action="/" method="post" id="lobbyForm">
-    <% for (let i = 1; i <= lobbiesIDs.length; i++) { %>
-      <div class="lobbyList">
-        <div style="margin-bottom: 10px;"><b><u><%= lobbiesIDs[i-1].name %>'s Lobby %> </u></b></div>
-        <div>Small Blind: <%= lobbiesIDs[i-1].blind %></div>
-        <div id="PlayerCount">Players: <%= lobbiesIDs[i-1].players %>/8</div>
-        <div id="joinPrivate" value="<%=lobbiesIDs[i-1].private %>" >Private: <%= lobbiesIDs[i-1].private %> </div>
-        <input type="hidden" name="lobbyId_<%=lobbiesIDs[i-1].id%>" value="<%=lobbiesIDs[i-1].id%>">
-        <button type="submit" name="joinLobby_<%=lobbiesIDs[i-1].id%>" id="joinLobby" value="<%=lobbiesIDs[i-1].id%>" class="joinButton">Join Lobby</button>
-      </div>
-    <% } %>
-  </form>
+  <button class="homeButton" id="joinGame">Join Game</button>
+  <div id="lobbyFormWrapper">
+    <button id="joinGameBackButton"><</button>
+    <form action="/" method="post" id="lobbyForm">
+      <% for (let i = 1; i <= lobbiesIDs.length; i++) { %>
+        <div class="lobbyList">
+          <div style="margin-bottom: 10px;"><b><u><%= lobbiesIDs[i-1].name %>'s Lobby %> </u></b></div>
+          <div>Small Blind: <%= lobbiesIDs[i-1].blind %></div>
+          <div id="PlayerCount">Players: <%= lobbiesIDs[i-1].players %>/8</div>
+          <div id="joinPrivate" value="<%=lobbiesIDs[i-1].private %>" >Private: <%= lobbiesIDs[i-1].private %> </div>
+          <input type="hidden" name="lobbyId_<%=lobbiesIDs[i-1].id%>" value="<%=lobbiesIDs[i-1].id%>">
+          <button type="submit" name="joinLobby_<%=lobbiesIDs[i-1].id%>" id="joinLobby" value="<%=lobbiesIDs[i-1].id%>" class="joinButton">Join Lobby</button>
+        </div>
+      <% } %>
+    </form>
+  </div>
 
-
-    <script src="/socket.io/socket.io.js" defer></script>
+  <script src="/socket.io/socket.io.js" defer></script>
   <script type="module" defer>
     import { socket } from './socket.js'
     
     const createGame = document.getElementById('createGame')
     createGame.addEventListener('click', createGameForm)
+    const createGameBackButton = document.getElementById('createGameBackButton')
+    createGameBackButton.addEventListener('click', createGameForm)
 
-     function createGameForm() {
-       document.getElementById('createGameForm').classList.toggle('active')
-     }
+    function createGameForm() {
+      document.getElementById('createGameForm').classList.toggle('active')
+      createGameBackButton.classList.toggle('active')
+    }
 
     const privateCheckbox = document.getElementById('privateCheckbox');
     const passwordInput = document.getElementById('passwordInput')
@@ -65,8 +80,6 @@
         e.preventDefault();
       }
     });
-    
-
 
     submitForm.addEventListener('click', (e) => {
       e.preventDefault(); // Prevent default form submission
@@ -85,9 +98,17 @@
       }
     });
 
-    
     const joinLobbyButtons = document.querySelectorAll('.joinButton');
     const lobbyForm = document.getElementById('lobbyForm');
+
+    const joinGameButton = document.getElementById('joinGame')
+    joinGameButton.addEventListener('click', joinGameBTN)
+    const joinGameBackButton = document.getElementById('joinGameBackButton')
+    joinGameBackButton.addEventListener('click', joinGameBTN)
+
+    function joinGameBTN() {
+      document.getElementById('lobbyFormWrapper').classList.toggle('active')
+    }
 
     joinLobbyButtons.forEach(button => {
       button.addEventListener('click', (e) => {
@@ -134,8 +155,20 @@
       joinButton.classList.add('joinButton');
       newButton.appendChild(joinButton);
       document.getElementById('lobbyForm').appendChild(newButton);
-      });
+    });
 
+    const colorToggle = document.getElementById('colorToggle');
+    const htmlpage = document.getElementById('htmlpage')
+    colorToggle.addEventListener('change', () => {
+      if (colorToggle.checked) {
+        htmlpage.style.backgroundColor = '';
+        htmlpage.classList.add('rainbow'); // Add the rainbow class
+      } else {
+        htmlpage.style.backgroundColor = 'gray';
+        htmlpage.classList.remove('rainbow'); // Remove the rainbow class
+      }
+    });
+    
   </script>
 </body>
 </html>

@@ -29,6 +29,9 @@ class PokerGame {
   // Method to add a player to the game
   addPlayer(socket, username, money) {
     try {
+      if (!socket || !username || typeof money !== 'number') {
+        throw new Error("Invalid parameters for adding player.");
+      }
       this.players[socket.id] = {
         socket: socket,
         username: username,
@@ -47,65 +50,66 @@ class PokerGame {
       this.NoOfPlayers++;
       this.playerList.push({ p: this.players[socket.id].playerNum, n: username, m: money });
     } catch (error) {
-      console.error("Error adding player:", error);
+      console.error("Error adding player:", error.message, { socketId: socket.id, username, money });
     }
   }
 
   // Method to remove a player from the game
   removePlayer(socketId, i) {
     try {
-      if (this.players[socketId] != null) {
-        const index = this.playerTurn.indexOf(this.players[socketId].playerNum);
+      if (!this.players[socketId]) {
+        throw new Error("Player not found.");
+      }
+      const index = this.playerTurn.indexOf(this.players[socketId].playerNum);
 
-        if (index < i) {
-          this.i--;
-        } // If the player who leaves was before the current move, i back so that player doesn't lose their turn
-        if (i > this.playerTurn.length - 1) {
-          this.i = 0;
-        }
-        this.playerTurn = [];
-        for (let player in this.players) {
-          if (this.players[player].playerNum > this.players[socketId].playerNum) {
-            this.players[player].playerNum--;
-          }
-        }
-        this.playerList.splice(this.playerList.findIndex((obj) => obj.n === this.players[socketId].username), 1);
-        this.playerList.forEach(player => {
-          if (player.p > this.players[socketId].playerNum) {
-            player.p--;
-          }
-          if (player.playing && !player.folded && player.money > 0) {
-            this.playerTurn.push(player.p);
-          }
-        });
-
-        delete this.players[socketId];
-        this.NoOfPlayers--;
-
-        for (let p in this.players) {
-          this.players[p].socket.emit('updatePlayerList', this.getPlayers(), this.players[p].playerNum);
-        }
-
-        if (!this.gameStarted) {
-          this.checkOpted();
-        }
-
-        if (this.playerTurn.length <= 1 && this.gameStarted) {
-          this.gameStarted = false;
-          for (let player in this.players) {
-            if (this.players[player].playing == true) {
-              this.players[player].money += this.pot;
-            }
-            this.players[player].playing = null;
-            this.players[player].socket.emit('updatePlayerList', this.getPlayers(), this.players[player].playerNum);
-          }
-          this.NoOfPlayers--;
-          this.io.to(this.roomID).emit('optChoices', '<2');
-          console.log("New game");
+      if (index < i) {
+        this.i--;
+      } // If the player who leaves was before the current move, i back so that player doesn't lose their turn
+      if (i > this.playerTurn.length - 1) {
+        this.i = 0;
+      }
+      this.playerTurn = [];
+      for (let player in this.players) {
+        if (this.players[player].playerNum > this.players[socketId].playerNum) {
+          this.players[player].playerNum--;
         }
       }
+      this.playerList.splice(this.playerList.findIndex((obj) => obj.n === this.players[socketId].username), 1);
+      this.playerList.forEach(player => {
+        if (player.p > this.players[socketId].playerNum) {
+          player.p--;
+        }
+        if (player.playing && !player.folded && player.money > 0) {
+          this.playerTurn.push(player.p);
+        }
+      });
+
+      delete this.players[socketId];
+      this.NoOfPlayers--;
+
+      for (let p in this.players) {
+        this.players[p].socket.emit('updatePlayerList', this.getPlayers(), this.players[p].playerNum);
+      }
+
+      if (!this.gameStarted) {
+        this.checkOpted();
+      }
+
+      if (this.playerTurn.length <= 1 && this.gameStarted) {
+        this.gameStarted = false;
+        for (let player in this.players) {
+          if (this.players[player].playing == true) {
+            this.players[player].money += this.pot;
+          }
+          this.players[player].playing = null;
+          this.players[player].socket.emit('updatePlayerList', this.getPlayers(), this.players[player].playerNum);
+        }
+        this.NoOfPlayers--;
+        this.io.to(this.roomID).emit('optChoices', '<2');
+        console.log("New game");
+      }
     } catch (error) {
-      console.error("Error removing player:", error);
+      console.error("Error removing player:", error.message, { socketId, index: i });
     }
   }
 
@@ -118,7 +122,7 @@ class PokerGame {
       _cards.shuffle(this.deck);
       this.i = 0;
     } catch (error) {
-      console.error("Error starting game:", error);
+      console.error("Error starting game:", error.message);
     }
   }
 
@@ -183,7 +187,7 @@ class PokerGame {
         this.players[player].socket.emit('updatePlayerList', this.getPlayers(), this.players[player].playerNum);
       }
     } catch (error) {
-      console.error("Error starting new round:", error);
+      console.error("Error starting new round:", error.message);
     }
   }
 
@@ -241,7 +245,7 @@ class PokerGame {
             player.money = 0;
             player.lastAction = "All in";
           } else {
-            console.log("insufficient funds to match");
+            console.log("Insufficient funds to match");
             player.betted = true;
             player.totalbet = player.maxWin;
             this.pot += player.money;
@@ -279,7 +283,7 @@ class PokerGame {
         this.updateArrow(this.playerTurn[this.i]);
       }
     } catch (error) {
-      console.error("Error handling player bet:", error);
+      console.error("Error handling player bet:", error.message, { socketId, betType, amount });
     }
   }
 
@@ -294,7 +298,7 @@ class PokerGame {
       }
       return this.allBetted;
     } catch (error) {
-      console.error("Error checking if all players have betted:", error);
+      console.error("Error checking if all players have betted:", error.message);
     }
   }
 
@@ -309,7 +313,7 @@ class PokerGame {
       }
       this.checkOpted();
     } catch (error) {
-      console.error("Error handling player opt-in:", error);
+      console.error("Error handling player opt-in:", error.message, { socketId, vote });
     }
   }
 
@@ -335,7 +339,7 @@ class PokerGame {
 
       this.updateTimer();
     } catch (error) {
-      console.error("Error checking if all players have opted-in:", error);
+      console.error("Error checking if all players have opted-in:", error.message);
     }
   }
 
@@ -369,7 +373,7 @@ class PokerGame {
         }, 1000);
       }
     } catch (error) {
-      console.error("Error updating timer:", error);
+      console.error("Error updating timer:", error.message);
     }
   }
 
@@ -390,7 +394,7 @@ class PokerGame {
         this.roundEnd();
       }
     } catch (error) {
-      console.error("Error processing all betted:", error);
+      console.error("Error processing all betted:", error.message);
     }
   }
 
@@ -425,7 +429,7 @@ class PokerGame {
       // Added sidepots
       var sidePlayers = []; // Only include players that are playing
       for (let player in this.players) {
-        if (this.players[player].playing == true && this.players[player].folded != true) {
+        if ( this.players[player].playing == true && this.players[player].folded != true) {
           sidePlayers.push(this.players[player]);
         }
       }
@@ -499,7 +503,7 @@ class PokerGame {
       this.io.to(this.roomID).emit('updatePot', 0);
       this.gameStarted = false;
     } catch (error) {
-      console.error("Error ending round:", error);
+      console.error("Error ending round:", error.message);
     }
   }
 
@@ -509,7 +513,7 @@ class PokerGame {
         this.players[player].socket.emit("moveArrow", i, this.players[player].playerNum);
       }
     } catch (error) {
-      console.error("Error updating arrow:", error);
+      console.error("Error updating arrow:", error.message);
     }
   }
 
@@ -530,7 +534,7 @@ class PokerGame {
       }
       return gotPlayers;
     } catch (error) {
-      console.error("Error getting players:", error);
+      console.error("Error getting players:", error.message);
     }
   }
 }

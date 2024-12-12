@@ -373,8 +373,8 @@ html {
 }
 
 #currentBet {
-  top: -230%;
-  left: 400%;
+  top: -247%;
+  left: 5%;
   position: absolute;
   font-size: 30px;
   background: white;
@@ -532,8 +532,8 @@ html {
 
 #createGame {
   position: absolute;
-  top: 5%;
-  left: 80%;
+  top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
   width: 150px;
   height: 50px;
@@ -543,7 +543,7 @@ html {
   font-size: 20px;
   font-weight: bold;
   color: #ffffff;
-  cursor: pointer;
+  cursor: auto;
   -webkit-user-select: none; /*Added for safari*/
   user-select: none;
   margin: 2px;
@@ -642,11 +642,12 @@ html {
   font-size: 20px;
   font-weight: bold;
   color: #ffffff;
-  cursor: pointer;
+  cursor: progress;
   -webkit-user-select: none; /*Added for safari*/
   user-select: none;
   overflow-y: auto; /* Enable scrolling */
   z-index: 2;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
 .lobbyList {
@@ -768,15 +769,178 @@ html {
   border-color: red;
 }
 
-.active {
-  visibility: visible;
-}
-
 #pokerTitle {
   left: 50%;
-  top: 5%;
+  top: 33%;
   transform: translate(-50%, -50%);
   color: white;
   position: absolute;
-  font-size: 50px;
+  font-size: 88px;
+  /*-webkit-text-stroke: 1px black;*/
+  text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+.rainbow { 
+  background: linear-gradient(124deg, #ff2400, #e81d1d, #e8b71d, #e3e81d, #1de840, #1ddde8, #2b1de8, #dd00f3, #dd00f3);
+  background-size: 1800% 1800%;
+  
+  -webkit-animation: rainbow 18s ease infinite;
+  -z-animation: rainbow 18s ease infinite;
+  -o-animation: rainbow 18s ease infinite;
+  animation: rainbow 18s ease infinite;}
+  
+@-webkit-keyframes rainbow {
+  0%{background-position:0% 82%}
+  50%{background-position:100% 19%}
+  100%{background-position:0% 82%}
+}
+@-moz-keyframes rainbow {
+  0%{background-position:0% 82%}
+  50%{background-position:100% 19%}
+  100%{background-position:0% 82%}
+}
+@-o-keyframes rainbow {
+  0%{background-position:0% 82%}
+  50%{background-position:100% 19%}
+  100%{background-position:0% 82%}
+}
+@keyframes rainbow { 
+  0%{background-position:0% 82%}
+  50%{background-position:100% 19%}
+  100%{background-position:0% 82%}
+}
+
+/* Styles for the toggle switch */
+.toggle-container {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.toggle {
+  display: none;
+}
+
+.toggle-label {
+  width: 50px;
+  height: 24px;
+  background-color: gray;
+  border-radius: 50px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  left: 5vh;
+  top: 5vh;
+  border: 0.2vh solid black;
+}
+
+.toggle-label::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+.toggle:checked + .toggle-label {
+  background: linear-gradient(124deg, #ff2400, #e81d1d, #e8b71d, #e3e81d, #1de840, #1ddde8, #2b1de8, #dd00f3, #dd00f3);
+  background-size: 1800% 1800%;
+  
+  -webkit-animation: rainbow 18s ease infinite;
+  -z-animation: rainbow 18s ease infinite;
+  -o-animation: rainbow 18s ease infinite;
+  animation: rainbow 18s ease infinite;
+}
+
+.toggle:checked + .toggle-label::after {
+  transform: translateX(26px);
+}
+
+
+#lobbyFormWrapper {
+  visibility: hidden;
+}
+#lobbyFormWrapper.active {
+  visibility: visible;
+}
+
+.homeButton {
+  position: absolute;
+  top: 5%;
+  left: 80%;
+  transform: translate(-50%, -50%);
+  width: 150px;
+  height: 50px;
+  background-color: grey;
+  border: solid 2px black;
+  border-radius: 10px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  cursor: pointer;
+  -webkit-user-select: none; /*Added for safari*/
+  user-select: none;
+  margin: 2px;
+}
+
+#joinGame {
+  left: 50%;
+  top: 55vh;
+  transform: translate(-50%,-50%);
+}
+
+#joinGameBackButton {
+  position: absolute;
+  left: 23%;
+  top: 12.5%;
+}
+#createGameBackButton {
+  position: absolute;
+  left: 41%;
+  top: 28%;
+  visibility: hidden;
+  z-index: 5;
+}
+#createGameBackButton.active {
+  visibility: visible;
+}
+/* Make join lobby the EXACT same as phasmophobia */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.active {
+  visibility: visible;
 }
