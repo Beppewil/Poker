@@ -243,6 +243,8 @@ io.on("connection", (socket) => {
 
       // Reset the user's room data
       socket.data.room = null;
+
+      socket.emit('leaveRoom', 'Timed Out')
     }
   });
 

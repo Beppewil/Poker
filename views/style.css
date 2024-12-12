@@ -910,7 +910,30 @@ html {
 #createGameBackButton.active {
   visibility: visible;
 }
-/* Make join lobby the EXACT same as phasmophobia */
+
+#cheatSheet {
+	left: -0.5%;
+	top: 10vh;
+	position: absolute;
+	transform: translate(-100%,0%);
+  transition-duration: 1s;
+  z-index: 3;
+}
+#cheatSheet.cheat {
+	transform: translate(0%,0%);
+  transition-duration: 1.25s;
+}
+#cheatSheetButton {
+	border: none;
+	background: none;
+	top: 0%;
+	left: 100%;
+	position: absolute;
+  cursor: pointer;
+}
+#cheatSheetImg {
+}
+
 
 
 

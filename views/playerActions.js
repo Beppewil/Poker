@@ -21,6 +21,22 @@ var currentBet = document.getElementById('currentBet')
 var betted = document.getElementById('betted')
 let playersCards;
 
+document.addEventListener('keypress', function(e) {
+  switch(e.key){
+    case 'c':
+      _call()
+      break;
+    case 'r':
+      _raise()
+      break;
+    case 'f':
+      _fold()
+      break;
+    default:
+      break;
+  }
+})
+
 function _call() {
   socket.emit('playerBet', ['call', 0])
 } 
@@ -53,6 +69,14 @@ function _hideCards() {
     else {script.HTMLCardDisplay('back', 'player1Card')}
   } else return;
 }
+
+const cheatSheetButton = document.getElementById('cheatSheetButton')
+cheatSheetButton.addEventListener('click', cheatSheet);
+
+function cheatSheet() {
+  document.getElementById('cheatSheet').classList.toggle('cheat');
+}
+
 
 socket.on('roundOver', (msg) => {
   var winners = []
