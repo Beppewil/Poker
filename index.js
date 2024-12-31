@@ -70,7 +70,6 @@ app.post("/createLobby", function (req, res) {
   // Add the lobby to the list of available lobbies
   lobbiesIDs.push({ id: lobbiesIDs.length, name: req.body.gameName, blind: req.body.blindValue, players: 0, private: req.body.privateCheckbox == 'true' })
   lobbiesNumber.push(LOBBY_ID)
-  console.log(LOBBY_ID)
 
   // Create a new PokerGame instance for the lobby
   if (!lobbies[LOBBY_ID]) {
@@ -79,7 +78,6 @@ app.post("/createLobby", function (req, res) {
     } else {
       lobbies[LOBBY_ID] = new PokerGame(io, LOBBY_ID, Math.floor(Math.abs(req.body.blindValue)), null, lobbiesNumber.length - 1);
     }
-    console.log(lobbies[LOBBY_ID])
   }
 
   // Emit a 'newButton' event to update the lobby list

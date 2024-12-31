@@ -897,7 +897,7 @@ html {
 
 #joinGameBackButton {
   position: absolute;
-  left: 23%;
+  left: 23.5%;
   top: 12.5%;
 }
 #createGameBackButton {
@@ -931,9 +931,6 @@ html {
 	position: absolute;
   cursor: pointer;
 }
-#cheatSheetImg {
-}
-
 
 
 
