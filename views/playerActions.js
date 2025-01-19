@@ -171,10 +171,6 @@ socket.on('updateBet', (arr) => {
   currentBet.innerHTML = `Current Bet: ${arr[1]}`
 });
 
-socket.on('playerBet', (bet) => {
-  betted.innerHTML = `Betted: ${bet}`
-})
-
 socket.on('updatePot', (pot) => {
   document.getElementById('pot').innerHTML = `Pot: ${pot}`
 })
