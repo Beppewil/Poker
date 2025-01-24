@@ -21,21 +21,34 @@ var currentBet = document.getElementById('currentBet')
 var betted = document.getElementById('betted')
 let playersCards;
 
-document.addEventListener('keypress', function(e) {
-  switch(e.key){
-    case 'c':
-      _call()
-      break;
-    case 'r':
-      _raise()
-      break;
-    case 'f':
-      _fold()
-      break;
-    default:
-      break;
+document.addEventListener('keydown', function(e) {
+  const activeElement = document.activeElement;
+  
+  // Check if the active element is an input, textarea, or editable field
+  const isEditable =
+    activeElement.tagName === 'INPUT' ||
+    activeElement.tagName === 'TEXTAREA' ||
+    activeElement.isContentEditable;
+
+  if (!isEditable) {
+    switch (e.key) {
+      case 'c':
+        _call();
+        e.preventDefault(); // Prevent any default behavior for 'c'
+        break;
+      case 'r':
+        _raise();
+        e.preventDefault();
+        break;
+      case 'f':
+        _fold();
+        e.preventDefault();
+        break;
+      default:
+        break;
+    }
   }
-})
+});
 
 function _call() {
   socket.emit('playerBet', ['call', 0])
