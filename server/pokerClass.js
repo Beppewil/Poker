@@ -237,7 +237,7 @@ class PokerGame {
           }
         }
 
-        console.log(player.bet, player.money, betType, player.roundBet, this.currentBet); // Log betting information
+        
         // Check if the player can afford the bet
         if (player.money >= player.bet && player.bet >= 0 && player.money > 0) {
           if (betType === 'call') {
@@ -278,7 +278,7 @@ class PokerGame {
             player.money = 0; // Set player's money to zero
             player.lastAction = "All in"; // Update last action
           } else {
-            console.log("Insufficient funds to match"); // Log insufficient funds
+            console.log("Insufficient funds to match");
             player.betted = true; // Mark player as having betted
             player.totalbet = player.maxWin; // Set total bet to max win
             this.pot += player.money; // Add all remaining money to the pot

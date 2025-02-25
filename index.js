@@ -111,7 +111,7 @@ io.on("connection", (socket) => {
   socket.on('joinRoom', (roomId) => {
     // Check if the room exists
     if (!lobbies[roomId]) {
-      // Emit a 'leaveRoom' event with an error message
+      // Emit 'leaveRoom' if it doesn't
       socket.emit('leaveRoom', "Room Doesnt Exist")
     } else {
       // Check if the room is full
