@@ -198,8 +198,9 @@ class PokerGame {
         }
       }
       // Rotate the turn order for the next player
-      this.playerTurn.push(this.playerTurn.shift());
-      this.playerTurn.push(this.playerTurn.shift());
+      // this.playerTurn.push(this.playerTurn.shift());
+      // this.playerTurn.push(this.playerTurn.shift());
+      this.i = (this.playerTurn.length > 3) ? 2 : 0;
       this.currentBet = this.blindValue * 2; // Set current bet to double the blind
 
       this.updateArrow(this.playerTurn[this.i]); // Update the arrow to indicate current player
@@ -240,7 +241,7 @@ class PokerGame {
         
         // Check if the player can afford the bet
         if (player.money >= player.bet && player.bet >= 0 && player.money > 0) {
-          if (betType === 'call') {
+          if (betType === 'call' || player.bet == this.roundBet) {
             player.money -= player.bet; // Deduct bet from player's money
             this.pot += player.bet; // Add bet to the pot
             player.roundBet += player.bet; // Update round bet
@@ -268,6 +269,7 @@ class PokerGame {
             this.playerTurn.splice(this.playerTurn.indexOf(this.players[socketId].playerNum), 1); // Remove player from turn order
             player.lastAction = `Folded`; // Update last action
             this.i--; // Adjust turn index
+
           }
         } else {
           // Handle all-in situations
@@ -305,7 +307,7 @@ class PokerGame {
         player.socket.emit('playerBet', this.players[socketId].roundBet); // Notify player of their round bet
         this.io.to(this.roomID).emit("updatePot", this.pot); // Update pot information
         // Check if all players have betted or if there are no players left
-        if (this.checkAllBetted() || this.playerTurn.length < 1) {
+        if (this.checkAllBetted() || this.playerTurn.length <= 1) {
           this._allBetted(); // Process all betted
           this.currentBet = 0; // Reset current bet
           this.i = 0; // Reset turn index
@@ -552,7 +554,6 @@ class PokerGame {
           winningStatement: winningStatement, // Winning statement
           username: this.players[player].username, // Current player's username
         });
-
         this.players[player].lastAction = ""; // Reset last action for the player
       }
 
