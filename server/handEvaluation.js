@@ -38,7 +38,7 @@ function _pair(hand) {
       .sort((a, b) => b.v - a.v); // Sort in descending order
 
     // Construct the best five-card hand: two pairs + highest kicker
-    pairHand = pairsCards.concat(remainingCards.slice(0, 1));
+    pairHand = pairsCards.concat(remainingCards.slice(0, 5 - pairsCards.length));
 
     // Ensure the hand is exactly 5 cards (though it should be already)
     pairHand = pairHand.slice(0, 5);

@@ -75,7 +75,6 @@ socket.on('dealCards', (cards) => {
 function _hideCards() {
   if (document.getElementById('player1Card1').src != null) {
     console.log(document.getElementById('player1Card1').src)
-    console.log(playersCards)
     if (document.getElementById('player1Card1').src.includes('cardBack.png')) {
       script.HTMLCardDisplay(playersCards, 'player1Card')
     }
@@ -137,19 +136,18 @@ socket.on('showCards', (cards) => {
 
 socket.on('moveArrow', (num, playerNum) => {
   for (let i = 1; i < 9; i++) {
-    document.getElementById(`player${i}Container`).classList.remove("turn")
+    document.getElementById(`player${i}Container`).classList.remove("turn") // remove turn class from all players
   }
-  console.log(playerNum, num)
-  if (playerNum != num) { 
-    if (playerNum !== 1) {
-      if (playerNum > num) {
-      document.getElementById(`player${num + 1}Container`).classList.add("turn")
-      } else {document.getElementById(`player${num}Container`).classList.add("turn")}
+  if (playerNum != num) { // if player is not the current player
+    if (playerNum !== 1) { // if player is not the dealer
+      if (playerNum > num) { // if player is to the right of the current player
+      document.getElementById(`player${num + 1}Container`).classList.add("turn") // add turn class to the next player
+      } else {document.getElementById(`player${num}Container`).classList.add("turn")} // add turn class to the current player
     } 
     else {
-      document.getElementById(`player${num}Container`).classList.add("turn")
+      document.getElementById(`player${num}Container`).classList.add("turn") // add turn class to the current player
     }
-  } else {document.getElementById(`player1Container`).classList.add("turn")}
+  } else {document.getElementById(`player1Container`).classList.add("turn")} // add turn class to the current player
 })
 
 function optIN() {
