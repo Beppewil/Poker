@@ -95,6 +95,7 @@ app.get("/:room", function (req, res) {
 
 // Set up socket.io event listeners
 io.on("connection", (socket) => {
+
   // Handle 'joinPrivateLobby' event
   socket.on('joinPrivateLobby', (lobbyNum, password) => {
     // Check if the password is correct
@@ -174,14 +175,15 @@ io.on("connection", (socket) => {
   socket.on('playerKick', (player) => {
     // Check if the user has permission to kick the player
     var kicked = false;
-    if (socket.data.room != null) {
-      if (lobbies[socket.data.room].players[socket.id].playerNum == 1) {
+    if (socket.data.room != null) { // If the lobby exists
+      if (lobbies[socket.data.room].players[socket.id].playerNum == 1) { // Check the kicking player is the host
         // Find the player to kick and remove them from the game
         for (let p in lobbies[socket.data.room].players) {
           if (lobbies[socket.data.room].players[p].playerNum == player && kicked == false) {
-            lobbies[socket.data.room].players[p].socket.emit('leaveRoom', 'You Have Been Kicked')
-            lobbies[socket.data.room].removePlayer(p, lobbies[socket.data.room].i);
-            kicked = true;
+            lobbies[socket.data.room].players[p].socket.emit('leaveRoom', 'You Have Been Kicked') // Tell the user they have been kicked
+            lobbies[socket.data.room].removePlayer(p, lobbies[socket.data.room].i); // Remove the player from the game
+            kicked = true; // Set kicked to true
+            return; // Break out the loop
           }
         }
       }

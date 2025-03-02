@@ -27,64 +27,77 @@ function twoPlayerHandComparison(hands) {
 }
 
 
-//obsolete
 function arrayHandComparison(hands) {
-  var winningHand = hands[0][1];
-  var winningHandValue = _handEvaluation.handEvaluation(hands[0][0])[0];
-  var winningHandDescription = _handEvaluation.handEvaluation(hands[0][0])[1];
-  var draw = [false, winningHand]
-  for (var i = 1; i < hands.length; i++) {
-    var currentHandValue = _handEvaluation.handEvaluation(hands[i][0])[0];
-    var currentHandDescription = _handEvaluation.handEvaluation(hands[i][0])[1];
-    console.log(_handEvaluation.handEvaluation(hands[i][0]), _handEvaluation.handEvaluation(hands[0][0]))
-    if (currentHandValue > winningHandValue) {
-      winningHand = i;
-      winningHandValue = currentHandValue;
-      winningHandDescription = currentHandDescription;
-      draw = [false, winningHand]
-    }
-    else if (currentHandValue == winningHandValue) {
-      var winningHandCards = _handEvaluation.handEvaluation(hands[winningHand][0])[3];
-      var currentHandCards = _handEvaluation.handEvaluation(hands[i][0])[3];
-      var drawing = true;
-      console.log(winningHandCards)
-      for (var e = 0; e < winningHandCards.length; e++) {
-        for (var j = 0; j < winningHandCards[e].length; j++) {
-          if (currentHandCards[e][j].v > winningHandCards[e][j].v) {
-            winningHand = hands[i][1];
-            winningHandDescription = currentHandDescription;
-            draw = [false, winningHand]
-            drawing = false;
-            break;
-          }
-          else if (currentHandCards[e][j].v < winningHandCards[e][j].v) {
-            draw = [false, winningHand]
-            drawing = false;
-            break;
-          }
-        }
-        if (!drawing) {
-          break;
-        }
-      }
-      if (drawing) {
-        draw[0] = true;
-        draw.push(hands[i][1])
-      }
-    }
+  // If there's only one hand, return it as the winner
+  if (hands.length === 1) {
+    return [_handEvaluation.handEvaluation(hands[0].c, hands[0].p, hands[0].n)]; // Return the evaluated hand object
   }
-  if (hands.length == 1) {
-    return [1];
-  }
-  else if (draw[0]) {
 
-    var drawStatement = [(parseInt(draw[1]))]
-    for (let i = 2; i < draw.length; i++) {
-      drawStatement.push(parseInt(draw[i]))
+  // Initialize the winning hand as the first hand in the array
+  var winningHandIndex = 0; // Index of the current winning hand
+  var winningHandValue = _handEvaluation.handEvaluation(hands[0].c, hands[0].p, hands[0].n).rank; // Rank of the winning hand
+  var winningHandDescription = _handEvaluation.handEvaluation(hands[0].c, hands[0].p, hands[0].n).name; // Description of the winning hand
+  var draw = [false, winningHandIndex]; // Track if there is a draw and the winning hands. [isDraw, winningHandIndex]
+
+  // Iterate through the remaining hands to find the best one
+  for (var i = 1; i < hands.length; i++) {
+    // Evaluate the current hand's rank and description
+    var currentHandValue = _handEvaluation.handEvaluation(hands[i].c, hands[i].p, hands[i].n).rank;
+    var currentHandDescription = _handEvaluation.handEvaluation(hands[i].c, hands[i].p, hands[i].n).name;
+
+    // If the current hand is stronger than the winning hand, update the winning hand
+    if (currentHandValue > winningHandValue) {
+      winningHandIndex = i; // Update the winning hand index
+      winningHandValue = currentHandValue; // Update the winning hand's rank
+      winningHandDescription = currentHandDescription; // Update the winning hand's description
+      draw = [false, winningHandIndex]; // Reset the draw status since there's a clear winner
     }
-    return drawStatement
+    // If the current hand is of the same strength as the winning hand, compare individual cards
+    else if (currentHandValue === winningHandValue) {
+      // Get the cards of the winning hand and the current hand for comparison
+      var winningHandCards = _handEvaluation.handEvaluation(hands[winningHandIndex].c, hands[winningHandIndex].p, hands[winningHandIndex].n).cards;
+      var currentHandCards = _handEvaluation.handEvaluation(hands[i].c, hands[i].p, hands[i].n).cards;
+      var drawing = true; // Assume it's a draw unless proven otherwise
+
+      console.log(winningHandCards, currentHandCards); // Log the cards for debugging
+
+      // Compare individual cards to determine the stronger hand
+      for (var e = 0; e < winningHandCards.length; e++) {
+        // If the current hand's card is stronger, update the winning hand
+        if (currentHandCards[e].v > winningHandCards[e].v) {
+          winningHandIndex = i; // Update the winning hand index
+          winningHandDescription = currentHandDescription; // Update the description
+          draw = [false, winningHandIndex]; // Reset the draw status
+          drawing = false; // Mark that it's not a draw
+          break; // Exit the loop since we found a stronger card
+        }
+        // If the current hand's card is weaker, keep the current winning hand
+        else if (currentHandCards[e].v < winningHandCards[e].v) {
+          draw = [false, winningHandIndex]; // Reset the draw status
+          drawing = false; // Mark that it's not a draw
+          break; // Exit the loop since the current hand is weaker
+        }
+      }
+
+      // If it's still a draw after comparing all cards, mark it as a draw
+      if (drawing) {
+        draw[0] = true; // Set the draw flag to true
+        draw.push(i); // Add the current hand index to the draw list
+      }
+    }
   }
-  return [winningHand]  //winningHandDescription;
+
+  // If there's a draw, return the list of drawing hands as full objects
+  if (draw[0]) {
+    var drawHands = [];
+    for (let i = 1; i < draw.length; i++) {
+      drawHands.push(_handEvaluation.handEvaluation(hands[draw[i]].c, hands[draw[i]].p, hands[draw[i]].n)); // Add the evaluated hand object
+    }
+    return drawHands; // Return the list of drawing hands
+  }
+
+  // Return the winning hand as a full object
+  return [_handEvaluation.handEvaluation(hands[winningHandIndex].c, hands[winningHandIndex].p, hands[winningHandIndex].n)]; // Return the evaluated winning hand object
 }
 
 //Actual Function
