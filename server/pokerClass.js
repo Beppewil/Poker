@@ -241,7 +241,7 @@ class PokerGame {
         
         // Check if the player can afford the bet
         if (player.money >= player.bet && player.bet >= 0 && player.money > 0) {
-          if (betType === 'call' || player.bet == this.roundBet) {
+          if (betType === 'call' || player.bet === this.roundBet) {
             player.money -= player.bet; // Deduct bet from player's money
             this.pot += player.bet; // Add bet to the pot
             player.roundBet += player.bet; // Update round bet
@@ -391,44 +391,40 @@ class PokerGame {
     }
   }
 
-  // Method to update the timer
+// Method to update the timer
   updateTimer() {
-    try {
-      if (this.timer) clearTimeout(this.timer); // Clear existing timer
+    if (this.timer) clearTimeout(this.timer); // Clear existing timer
 
-      var over = false; // Flag to check if time is over
-      // If not everyone has opted in
-      if (!this.everyonePlaying) {
-        if (this.timeLeft > 0) {
-          // If more than half of players have opted in, decrement the timer
-          if ((Object.keys(this.players).filter(key => this.players[key].playing == true).length) / Object.keys(this.players).length >= 0.5 && Object.keys(this.players).length > 2) {
-            this.timeLeft--; // Decrement time left
-            this.io.to(this.roomID).emit("updateTimer", this.timeLeft, false); // Update timer display
-          } else {
-            this.io.to(this.roomID).emit("updateTimer", this.timeLeft, true); // Update timer display with warning
-            over = true; // Set over flag
-          }
+
+    var over = false; // Flag to check if time is over
+    // If not everyone has opted in
+    if (!this.everyonePlaying) {
+      if (this.timeLeft > 0) {
+        // If more than half of players have opted in, decrement the timer
+        if ((Object.keys(this.players).filter(key => this.players[key].playing == true).length) / Object.keys(this.players).length >= 0.5 && Object.keys(this.players).length > 2) {
+          this.timeLeft--; // Decrement time left
+          this.io.to(this.roomID).emit("updateTimer", this.timeLeft, false); // Update timer display
         } else {
-          console.log("new round"); // Log new round start
-          this.newRound(); // Start a new round
-          this.io.to(this.roomID).emit("updateTimer", this.timeLeft, true); // Update timer display
+          this.io.to(this.roomID).emit("updateTimer", this.timeLeft, true); // Update timer display with warning
           over = true; // Set over flag
         }
       } else {
-        this.io.to(this.roomID).emit("updateTimer", this.timeLeft, true); // Update timer display if everyone has opted in
-        return; // Exit if everyone has opted in
+        console.log("new round"); // Log new round start
+        this.newRound(); // Start a new round
+        this.io.to(this.roomID).emit("updateTimer", this.timeLeft, true); // Update timer display
+        over = true; // Set over flag
       }
-      // If time is still left and not over, set a timeout to update the timer again
-      if (this.timeLeft >= 0 && !over) {
-        this.timer = setTimeout(() => {
-          this.updateTimer(); // Call updateTimer again after 1 second
-        }, 1000);
-      }
-    } catch (error) {
-      // Log error if updating timer fails
-      console.error("Error updating timer:", error.message);
+    } else {
+      this.io.to(this.roomID).emit("updateTimer", this.timeLeft, true); // Update timer display if everyone has opted in
+      return; // Exit if everyone has opted in
     }
-  }
+    // If time is still left and not over, set a timeout to update the timer again
+    if (this.timeLeft >= 0 && !over) {
+      this.timer = setTimeout(() => {
+        this.updateTimer(); // Call updateTimer again after 1 second
+      }, 1000);
+ 	}
+ }
 
   // Method to handle the situation when all players have betted
   _allBetted() {
@@ -533,7 +529,7 @@ class PokerGame {
         for (let player in sidepots[sidepot].players) {
           elligablePlayers.push({ c: sidepots[sidepot].players[player].hand, p: sidepots[sidepot].players[player].playerNum, n: sidepots[sidepot].players[player].username });
         }
-        var sidepotWinner = _handComparison.handComparison(elligablePlayers); // Determine winners using hand comparison
+        var sidepotWinner = _handComparison.arrayHandComparison(elligablePlayers); // Determine winners using hand comparison
 
         // Distribute winnings to the winners
         for (let winner of sidepotWinner) {
@@ -553,6 +549,7 @@ class PokerGame {
           winners: winningUsernames, // List of winners
           winningStatement: winningStatement, // Winning statement
           username: this.players[player].username, // Current player's username
+          handRank: _handEvaluation.handEvaluation(this.players[player]).rank
         });
         this.players[player].lastAction = ""; // Reset last action for the player
       }
