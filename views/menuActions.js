@@ -8,9 +8,16 @@ const leaveBTN = document.getElementById('leaveBTN'); // Leave button
 var blackTriangle = document.getElementById("black-triangle"); // Triangle icon for menu
 var playerOptionsBTN = document.getElementById("playerOptions"); // Player options button
 var gameTimer = document.getElementById('gameTimer'); // Game timer display
+var muteBTN = document.getElementById('mute') // Voice Chat mute button
+const deafenBTN = document.getElementById('deafenBTN');
 
 // Import the socket connection
 import { socket } from './socket.js';
+
+// WebRTC Voice Chat Variables
+let localStream;
+let isMuted = true;
+let peers = {};
 
 // Add hover effects to the black triangle (menu icon)
 blackTriangle.addEventListener('mouseover', function () {
@@ -190,3 +197,121 @@ socket.on('leaveRoom', (msg) => {
   alert(msg); // Show a message when leaving the room
   window.location.href = '/'; // Redirect to the home page
 });
+
+// WebRTC Voice Chat Functions
+let remoteAudioElements = {}; // Store remote audio elements
+let isDeafened = true;
+
+function createPeer(id) {
+  const peer = new RTCPeerConnection({
+    iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+  });
+  
+  peer.onicecandidate = event => {
+    if (event.candidate) {
+      socket.emit("ice-candidate", id, event.candidate);
+    }
+  };
+  
+  peer.ontrack = event => {
+    const remoteAudio = new Audio();
+    remoteAudio.srcObject = event.streams[0];
+    remoteAudio.autoplay = true;
+    remoteAudio.muted = isDeafened; // Apply current deafen state
+    
+    // Store the audio element for this peer
+    remoteAudioElements[id] = remoteAudio;
+  };
+  
+  peer.onnegotiationneeded = async () => {
+    const offer = await peer.createOffer();
+    await peer.setLocalDescription(offer);
+    socket.emit("offer", id, peer.localDescription);
+  };
+  
+  return peer;
+}
+
+// WebRTC Socket Events
+socket.on('connect', () => {
+  // Initialize WebRTC voice chat when connected
+  navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+    .then(stream => {
+      localStream = stream;
+      
+      socket.on("new-user", id => {
+        const peer = createPeer(id);
+        peers[id] = peer;
+        stream.getTracks().forEach(track => peer.addTrack(track, stream));
+      });
+      
+      socket.on("offer", async (id, offer) => {
+        const peer = createPeer(id);
+        peers[id] = peer;
+        await peer.setRemoteDescription(new RTCSessionDescription(offer));
+        stream.getTracks().forEach(track => peer.addTrack(track, stream));
+        const answer = await peer.createAnswer();
+        await peer.setLocalDescription(answer);
+        socket.emit("answer", id, answer);
+      });
+      
+      socket.on("answer", async (id, answer) => {
+        await peers[id]?.setRemoteDescription(new RTCSessionDescription(answer));
+      });
+      
+      socket.on("ice-candidate", async (id, candidate) => {
+        if (peers[id]) {
+          await peers[id].addIceCandidate(new RTCIceCandidate(candidate));
+        }
+      });
+      
+      socket.on("user-disconnected", id => {
+        if (peers[id]) {
+          peers[id].close();
+          delete peers[id];
+        }
+        // Clean up remote audio element
+        if (remoteAudioElements[id]) {
+          delete remoteAudioElements[id];
+        }
+      });
+    })
+    .catch(error => {
+      console.error('Error accessing microphone:', error);
+    });
+});
+
+// Mute/Unmute functionality
+muteBTN.addEventListener('click', toggleMute);
+
+function toggleMute() {
+  if (localStream) {
+    isMuted = !isMuted;
+    localStream.getAudioTracks()[0].enabled = !isMuted;
+    console.log(isMuted ? "Muted" : "Unmuted");
+    muteBTN.innerHTML = isMuted ? "Unmute" : "Mute";
+    return isMuted;
+  }
+}
+
+// Deafen/Undeafen functionality
+deafenBTN.addEventListener('click', toggleDeafen);
+
+function toggleDeafen() {
+  isDeafened = !isDeafened;
+  isMuted = !isMuted;
+  
+  // Apply deafen state to all current remote audio elements
+  Object.values(remoteAudioElements).forEach(audioElement => {
+    audioElement.muted = isDeafened;
+  });
+  
+  console.log(isDeafened ? "Deafened" : "Undeafened");
+  deafenBTN.innerHTML = isDeafened ? "Undeafen" : "Deafen";
+  muteBTN.innerHTML = isDeafened ? "Unmute" : "Mute";
+  return isDeafened;
+}
+
+// Export functions for global access
+window.toggleMute = toggleMute;
+window.toggleDeafen = toggleDeafen;

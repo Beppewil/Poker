@@ -57,7 +57,6 @@ app.post('/', (req, res) => {
   const lobbyId = req.body.lobbyId;
   console.log(lobbyId)
   console.log(lobbiesNumber)
-  //console.log(lobbies[lobbiesNumber[lobbyId]])
   // Redirect the user to the lobby page
   res.redirect(`/${lobbiesNumber[lobbyId]}`)
 });
@@ -143,11 +142,27 @@ io.on("connection", (socket) => {
 
         // Emit a 'playerJoin' event to confirm the user's join
         socket.emit('playerJoin', '');
+
+        // Notify other users in the room about the new user (for WebRTC)
+        socket.to(roomId).emit("new-user", socket.id);
       } else {
         // Emit a 'leaveRoom' event with an error message
         socket.emit('leaveRoom', "Room Full")
       }
     }
+  });
+
+  // WebRTC Voice Chat Events
+  socket.on("offer", (id, offer) => {
+    io.to(id).emit("offer", socket.id, offer);
+  });
+
+  socket.on("answer", (id, answer) => {
+    io.to(id).emit("answer", socket.id, answer);
+  });
+
+  socket.on("ice-candidate", (id, candidate) => {
+    io.to(id).emit("ice-candidate", socket.id, candidate);
   });
 
   // Handle 'usernameEntered' event
@@ -220,6 +235,9 @@ io.on("connection", (socket) => {
         lobbies[socket.data.room].players[p ].socket.emit('updatePlayerList', lobbies[socket.data.room].getPlayers(), lobbies[socket.data.room].players[p].playerNum)
       }
 
+      // Notify other users about disconnection (for WebRTC)
+      socket.broadcast.emit("user-disconnected", socket.id);
+
       // Reset the user's room data
       socket.data.room = null;
     }
@@ -246,6 +264,9 @@ io.on("connection", (socket) => {
 
       socket.emit('leaveRoom', 'Timed Out')
     }
+
+    // Notify other users about disconnection (for WebRTC)
+    socket.broadcast.emit("user-disconnected", socket.id);
   });
 
   // Handle 'chat message' event

@@ -934,8 +934,32 @@ html {
 }
 
 
+#mute, #deafenBTN {
+  text-align: center;
+  font-size: 22px;
+  color: white;
+  border: 2px solid #000;
+  border-radius: 5px;
+  width: 150px;
+  height: 40px;
+  transform: translate(-50%,-50%);
+  left: 85%;
+  display: inline-block;
+  z-index: 2;
+}
 
-
+#mute {
+  position: fixed;
+  top: 5%;
+  background-color: #222;
+  transform: translate(-50%, -50%);
+}
+#deafenBTN {
+  position: fixed;
+  top: 10%;
+  background-color: #222;
+  transform: translate(-50%, -50%);
+}
 
 
 
