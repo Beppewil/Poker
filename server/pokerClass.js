@@ -453,123 +453,127 @@ class PokerGame {
   }
 
   // Method to end the round and determine winners
-  roundEnd() {
-    try {
-      var comparisonArray = []; // Array to hold players' hands for comparison
-      var winningStatement = ""; // String to hold the winning statement
-      var winningUsernames = []; // Array to hold usernames of winners
+roundEnd() {
+  try {
+    var comparisonArray = []; // Array to hold players' hands for comparison
+    var winningStatement = ""; // String to hold the winning statement
+    var winningUsernames = []; // Array to hold usernames of winners
 
-      // Displaying each player's cards
-      for (let player in this.players) {
-        var tempCards = [];
-        tempCards.push(...this.playerCards); // Copy player cards
-        tempCards.splice(tempCards.indexOf(this.players[player].hand), 1); // Remove the player's cards from the array
-        this.players[player].socket.emit("showCards", tempCards); // Show cards to the player
-      }
-
-      // Adding the community cards to each player's hand
-      for (let player in this.players) {
-        if (this.players[player].folded == false && this.players[player].playing == true) {
-          for (let card in this.comCards) {
-            this.players[player].hand.push(this.comCards[card]); // Add community cards to player's hand
-          }
-          comparisonArray.push({ c: this.players[player].hand, p: this.players[player].playerNum }); // Prepare for comparison
-        } else {
-          for (let card in this.comCards) {
-            this.players[player].hand.push(this.comCards[card]); // Add community cards to folded player's hand
-          }
-        }
-      }
-
-      // Added sidepots
-      var sidePlayers = []; // Only include players that are playing
-      for (let player in this.players) {
-        if (this.players[player].playing == true && this.players[player].folded != true) {
-          sidePlayers.push(this.players[player]); // Add active players to sidePlayers
-        }
-      }
-      Object.values(sidePlayers).sort((a, b) => a.totalbet - b.totalbet); // Sort the players by their total bets
-
-      var sidepots = []; // Array to hold side pots
-
-      // Determine side pots based on players' total bets
-      if (sidepots.length > 1) {
-        for (let i = 0; i < Object.keys(sidePlayers).length; i++) {
-          if (i != Object.keys(sidePlayers).length - 1) {
-            if (sidePlayers[i].totalbet < sidePlayers[i + 1].totalbet) {
-              var elligablePlayers = []; // Array to hold eligible players for the side pot
-              for (let e = i; e < Object.keys(sidePlayers).length; e++) {
-                elligablePlayers.push(sidePlayers[e]); // Add eligible players to the array
-              }
-              sidepots.push({ pot: sidePlayers[i].totalbet * Object.keys(this.players).filter(player => this.players[player].totalbet >= sidePlayers[i].totalbet).length, players: elligablePlayers }); // Create a side pot
-            }
-          } else {
-            if (sidePlayers[i].totalbet > sidePlayers[i - 1].totalbet) {
-              this.players[sidePlayers[i].socket.id].money += sidePlayers[i].totalbet - sidePlayers[i - 1].totalbet; // Adjust money for the last player
-            }
-          }
-        }
-      }
-
-      // If no side pots, create a main pot
-      if (sidepots.length == 0 && sidePlayers.length > 0) {
-        sidepots.push({ pot: this.pot, players: sidePlayers }); // Create main pot
-      }
-
-      // Determine winners for each side pot
-      for (let sidepot in sidepots) {
-        var elligablePlayers = []; // Array to hold eligible players for the current side pot
-        if (sidepot == 0) {
-          winningStatement += "Main Pot " + (parseInt(sidepots[sidepot].pot)) + " winners: "; // Add main pot information to winning statement
-        } else {
-          winningStatement += "Sidepot " + (parseInt(sidepots[sidepot].pot)) + " winners: "; // Add side pot information to winning statement
-        }
-
-        // Prepare eligible players for hand comparison
-        for (let player in sidepots[sidepot].players) {
-          elligablePlayers.push({ c: sidepots[sidepot].players[player].hand, p: sidepots[sidepot].players[player].playerNum, n: sidepots[sidepot].players[player].username });
-        }
-        var sidepotWinner = _handComparison.arrayHandComparison(elligablePlayers); // Determine winners using hand comparison
-
-        // Distribute winnings to the winners
-        for (let winner of sidepotWinner) {
-          for (let player in this.players) {
-            if (winner.username == this.players[player].username) {
-              this.players[player].money += sidepots[sidepot].pot / sidepotWinner.length; // Distribute pot equally among winners
-              winningUsernames.push(this.players[player].username); // Add winner's username to the list
-              winningStatement += this.players[player].username + ", "; // Update winning statement
-            }
-          }
-        }
-      }
-
-      // Notify all players of the round results
-      for (let player in this.players) {
-        this.players[player].socket.emit('roundOver2', {
-          winners: winningUsernames, // List of winners
-          winningStatement: winningStatement, // Winning statement
-          username: this.players[player].username, // Current player's username
-          handRank: _handEvaluation.handEvaluation(this.players[player]).rank
-        });
-        this.players[player].lastAction = ""; // Reset last action for the player
-      }
-
-      // Update player list for all players
-      for (let player in this.players) {
-        this.players[player].socket.emit('updatePlayerList', this.getPlayers(), this.players[player].playerNum);
-        this.players[player].playing = null; // Reset playing status
-      }
-
-      // Notify players of the end of the round
-      this.io.to(this.roomID).emit('optChoices', 'balls'); // Notify players to make choices
-      this.io.to(this.roomID).emit("nextCards", ''); // Clear next cards display
-      this.io.to(this.roomID).emit('updatePot', 0); // Reset pot
-      this.gameStarted = false; // End the game
-    } catch (error) {
-      // Log error if ending round fails
-      console.error("Error ending round:", error.message);
+    // Displaying each player's cards
+    for (let player in this.players) {
+      var tempCards = [];
+      tempCards.push(...this.playerCards); // Copy player cards
+      tempCards.splice(tempCards.indexOf(this.players[player].hand), 1); // Remove the player's cards from the array
+      this.players[player].socket.emit("showCards", tempCards); // Show cards to the player
     }
+
+    // Adding the community cards to each player's hand
+    for (let player in this.players) {
+      if (this.players[player].folded == false && this.players[player].playing == true) {
+        for (let card in this.comCards) {
+          this.players[player].hand.push(this.comCards[card]); // Add community cards to player's hand
+        }
+        comparisonArray.push({ c: this.players[player].hand, p: this.players[player].playerNum }); // Prepare for comparison
+      } else {
+        for (let card in this.comCards) {
+          this.players[player].hand.push(this.comCards[card]); // Add community cards to folded player's hand
+        }
+      }
+    }
+
+    // Added sidepots
+    var sidePlayers = []; // Only include players that are playing
+    for (let player in this.players) {
+      if (this.players[player].playing == true && this.players[player].folded != true) {
+        sidePlayers.push(this.players[player]); // Add active players to sidePlayers
+      }
+    }
+    Object.values(sidePlayers).sort((a, b) => a.totalbet - b.totalbet); // Sort the players by their total bets
+
+    var sidepots = []; // Array to hold side pots
+
+    // Determine side pots based on players' total bets
+    if (sidepots.length > 1) {
+      for (let i = 0; i < Object.keys(sidePlayers).length; i++) {
+        if (i != Object.keys(sidePlayers).length - 1) {
+          if (sidePlayers[i].totalbet < sidePlayers[i + 1].totalbet) {
+            var elligablePlayers = []; // Array to hold eligible players for the side pot
+            for (let e = i; e < Object.keys(sidePlayers).length; e++) {
+              elligablePlayers.push(sidePlayers[e]); // Add eligible players to the array
+            }
+            sidepots.push({ pot: sidePlayers[i].totalbet * Object.keys(this.players).filter(player => this.players[player].totalbet >= sidePlayers[i].totalbet).length, players: elligablePlayers }); // Create a side pot
+          }
+        } else {
+          if (sidePlayers[i].totalbet > sidePlayers[i - 1].totalbet) {
+            this.players[sidePlayers[i].socket.id].money += sidePlayers[i].totalbet - sidePlayers[i - 1].totalbet; // Adjust money for the last player
+          }
+        }
+      }
+    }
+
+    // If no side pots, create a main pot
+    if (sidepots.length == 0 && sidePlayers.length > 0) {
+      sidepots.push({ pot: this.pot, players: sidePlayers }); // Create main pot
+    }
+
+    // Determine winners for each side pot
+    for (let sidepot in sidepots) {
+      var elligablePlayers = []; // Array to hold eligible players for the current side pot
+      if (sidepot == 0) {
+        winningStatement += "Main Pot " + (parseInt(sidepots[sidepot].pot)) + " winners: "; // Add main pot information to winning statement
+      } else {
+        winningStatement += "Sidepot " + (parseInt(sidepots[sidepot].pot)) + " winners: "; // Add side pot information to winning statement
+      }
+
+      // Prepare eligible players for hand comparison
+      for (let player in sidepots[sidepot].players) {
+        elligablePlayers.push({ c: sidepots[sidepot].players[player].hand, p: sidepots[sidepot].players[player].playerNum, n: sidepots[sidepot].players[player].username });
+      }
+      var sidepotWinner = _handComparison.arrayHandComparison(elligablePlayers); // Determine winners using hand comparison
+
+      // Distribute winnings to the winners
+      for (let winner of sidepotWinner) {
+        for (let player in this.players) {
+          if (winner.username == this.players[player].username) {
+            this.players[player].money += sidepots[sidepot].pot / sidepotWinner.length; // Distribute pot equally among winners
+            winningUsernames.push(this.players[player].username); // Add winner's username to the list
+            winningStatement += this.players[player].username + ", "; // Update winning statement
+          }
+        }
+      }
+    }
+
+    // Notify all players of the round results
+    for (let player in this.players) {
+      this.players[player].socket.emit('roundOver2', {
+        winners: winningUsernames, // List of winners
+        winningStatement: winningStatement, // Winning statement
+        username: this.players[player].username, // Current player's username
+        handRank: _handEvaluation.handEvaluation(
+          this.players[player].hand, 
+          this.players[player].playerNum, 
+          this.players[player].username
+        ).name
+      });
+      this.players[player].lastAction = ""; // Reset last action for the player
+    }
+
+    // Update player list for all players
+    for (let player in this.players) {
+      this.players[player].socket.emit('updatePlayerList', this.getPlayers(), this.players[player].playerNum);
+      this.players[player].playing = null; // Reset playing status
+    }
+
+    // Notify players of the end of the round
+    this.io.to(this.roomID).emit('optChoices', 'balls'); // Notify players to make choices
+    this.io.to(this.roomID).emit("nextCards", ''); // Clear next cards display
+    this.io.to(this.roomID).emit('updatePot', 0); // Reset pot
+    this.gameStarted = false; // End the game
+  } catch (error) {
+    // Log error if ending round fails
+    console.error("Error ending round:", error.message);
   }
+}
 
   // Method to update the arrow indicating the current player's turn
   updateArrow(i) {
