@@ -547,7 +547,7 @@ roundEnd() {
     for (let player in this.players) {
       this.players[player].socket.emit('roundOver2', {
         winners: winningUsernames, // List of winners
-        winningStatement: winningStatement, // Winning statement
+        winningStatement: this.players[player].playing ? winningStatement : "You did not play this round", // Winning statement
         username: this.players[player].username, // Current player's username
         handRank: _handEvaluation.handEvaluation(
           this.players[player].hand, 
