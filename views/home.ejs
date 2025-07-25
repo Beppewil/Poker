@@ -11,8 +11,9 @@
 <body>
   <!-- Declare lobbiesIDs as a global variable -->
   <script>
-    var lobbiesIDs = <%- JSON.stringify(lobbiesIDs) %>;
+    var lobbiesIDs = JSON.parse('<%= JSON.stringify(lobbiesIDs) %>');
   </script>
+
 
   <!-- Title of the page -->
   <h1 id="pokerTitle">Poker</h1>
