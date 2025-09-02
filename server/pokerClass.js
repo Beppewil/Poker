@@ -123,7 +123,6 @@ class PokerGame {
         }
         this.NoOfPlayers--; // Decrement player count
         this.io.to(this.roomID).emit('optChoices', '<2'); // Notify players of game end
-        console.log("New game"); // Log new game start
       }
     } catch (error) {
       // Log error if removing player fails
@@ -280,7 +279,6 @@ class PokerGame {
             player.money = 0; // Set player's money to zero
             player.lastAction = "All in"; // Update last action
           } else {
-            console.log("Insufficient funds to match");
             player.betted = true; // Mark player as having betted
             player.totalbet = player.maxWin; // Set total bet to max win
             this.pot += player.money; // Add all remaining money to the pot
@@ -374,7 +372,6 @@ class PokerGame {
 
       // If everyone has opted in and there are at least 2 players, start a new round
       if (this.everyonePlaying && Object.keys(this.players).filter(key => this.players[key].playing == true).length >= 2) {
-        console.log("NEW ROUND"); // Log new round start
         this.newRound(); // Start a new round
         return;
       }
@@ -409,7 +406,6 @@ class PokerGame {
           over = true; // Set over flag
         }
       } else {
-        console.log("new round"); // Log new round start
         this.newRound(); // Start a new round
         this.io.to(this.roomID).emit("updateTimer", this.timeLeft, true); // Update timer display
         over = true; // Set over flag

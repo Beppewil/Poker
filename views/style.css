@@ -903,8 +903,8 @@ html {
 }
 #createGameBackButton {
   position: absolute;
-  left: 41%;
-  top: 28%;
+  left: 5%;
+  top: 5%;
   visibility: hidden;
   z-index: 5;
 }
@@ -961,7 +961,16 @@ html {
   transform: translate(-50%, -50%);
 }
 
+audio[id^="remote-audio-"] {
+  display: none !important;
+}
 
+#startVoiceBtn {
+  position: absolute;
+  left: 50%;
+  top: 5%;
+  transform: translate(-50%, -50%);
+}
 
 
 

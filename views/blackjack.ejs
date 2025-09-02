@@ -1,17 +1,70 @@
 <!DOCTYPE html>
-<html lang="en" style="background: gray;">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width">
   <link href="/views/blackjack.css" rel="stylesheet" type="text/css"/>
   <title>Home</title>
 </head>
 <body>
-  <div id="unavailable">Blackjack comming soon</div>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <div id="unavailable">Blackjack coming soon</div>
+
+  <div class="aspect-ratio-container">
+
+    <div class="menu">
+        <div id="menuBtnWrapper">
+          <button class="menuBTN" id="menuBTN">Menu</button>
+          <!-- Changed from relative to absolute path -->
+          <img src="/views/Images/black-triangle.png" id="black-triangle">
+        </div>
+        <div class="wrapper" id="wrapper">
+            <div class="content">
+                <button class="contentBTN" id="optionsBTN">Options</button>
+                <form method="get" action="/" id="leaveBTN">
+                    <button type="submit" class="contentBTN">Leave</button>
+                </form>
+            </div>
+        </div>
+        <!-- Chat button - Changed from relative to absolute path -->
+        <img id="chat-btn" src="/views/Images/chat.png" draggable="false">
+
+        <!-- Chat window -->
+        <div id="chat-window">
+          <!-- Chat messages -->
+          <ul id="messages"></ul>
+
+          <!-- Chat form -->
+          <div id="chat-form">
+              <input id="input" autocomplete="off" />
+              <button id="chat-send">Send</button>
+          </div>
+        </div>
+    </div>
+
+    <div id="Dealer">
+      <div class="card-container">
+        <img id="DealerCard1" class="card-slot" src="/views/Images/Playing Cards/PNG-cards-1.3/cardBack.png" draggable="false"/>
+        <img id="DealerCard2" class="card-slot" src="/views/Images/Playing Cards/PNG-cards-1.3/10_of_spades.png" draggable="false"/>
+      </div>
+    </div>
 
 
+    <div id="Player">
+      <div class="card-container">
+        <img id="PlayerCard1" class="card-slot" src="/views/Images/Playing Cards/PNG-cards-1.3/10_of_clubs.png" draggable="false">
+        <img id="PlayerCard2" class="card-slot" src="/views/Images/Playing Cards/PNG-cards-1.3/ace_of_clubs.png" draggable="false">
+      </div>
+      <div id="PlayerMoney">1000</div>
+      <button class="game-button" id="hit">HIT</button>
+      <button class="game-button" id="stand">STAND</button>
+      <button class="game-button" id="doubledown">DOUBLE DOWN</button>
+      <button class="game-button" id="split">SPLIT</button>
+    </div>
 
 
+  <script src="blackjackActions.js"></script>
+  </div>
 </body>
 </html>

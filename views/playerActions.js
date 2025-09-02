@@ -1,6 +1,6 @@
 // Import necessary modules
-import * as script from './script.js'; // Import all functions/objects from script.js
-import { socket } from './socket.js'; // Import the socket connection from socket.js
+import * as script from '/views/script.js'; // Import all functions/objects from script.js
+import { socket } from '/views/socket.js'; // Import the socket connection from socket.js
 
 // Event Listeners for game actions
 var call = document.getElementById("call"); // Get the "Call" button
@@ -136,7 +136,8 @@ socket.on('newRound', (cards) => {
   document.getElementById('blurer').classList.remove('active'); // Hide the blur effect
   for (let i = 0; i < 5; i++) {
     let image = document.getElementById(`${`comCard`}${i + 1}`);
-    image.src = "./Images/Playing Cards/PNG-cards-1.3/cardBack.png"; // Reset community cards to card backs
+    // Changed from relative to absolute path
+    image.src = "/views/Images/Playing Cards/PNG-cards-1.3/cardBack.png"; // Reset community cards to card backs
     image.classList.remove("active"); // Remove 'active' class
   }
 });

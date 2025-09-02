@@ -55,10 +55,8 @@ app.get('/blackjack/:room', function (req, res) {
 app.post('/', (req, res) => {
   // Get the lobby ID from the hidden input field
   const lobbyId = req.body.lobbyId;
-  console.log(lobbyId)
-  console.log(lobbiesNumber)
   // Redirect the user to the lobby page
-  res.redirect(`/${lobbiesNumber[lobbyId]}`)
+  res.redirect(`/poker/${lobbiesNumber[lobbyId]}`)
 });
 
 // Handle POST request to create a new lobby
@@ -83,13 +81,13 @@ app.post("/createLobby", function (req, res) {
   io.emit('newButton', lobbiesIDs, req.body.gameName);
 
   // Redirect the user to the lobby page
-  res.redirect(`/${LOBBY_ID}`)
+  res.redirect(`/poker/${LOBBY_ID}`)
 });
 
-// Handle GET request to a specific lobby
-app.get("/:room", function (req, res) {
+// Handle GET request to a specific poker room
+app.get('/poker/:room', function (req, res) {
   // Render the poker page with the room ID
-  res.render("poker", { room: req.params.room });
+  res.render('poker', { room: req.params.room })
 })
 
 // Set up socket.io event listeners
@@ -117,7 +115,6 @@ io.on("connection", (socket) => {
       // Check if the room is full
       if (lobbies[roomId].NoOfPlayers < 8) {
         // Add the user to the room
-        console.log(`User joined room ${roomId}`);
         socket.data.room = roomId; // Store room on the socket
         socket.join(roomId);
 
@@ -219,13 +216,11 @@ io.on("connection", (socket) => {
     // Check if the user is in a room
     if (lobbies[socket.data.room]) {
       // Remove the user from the room
-      console.log(`User left room ${socket.data.room}`);
       socket.leave(socket.data.room);
       lobbies[socket.data.room].removePlayer(socket.id, lobbies[socket.data.room].i);
 
       // Update the lobby list
       const lobbyIndex = lobbies[socket.data.room].lobbyNum;
-      console.log(lobbyIndex)
       if (lobbyIndex != -1) {
         lobbiesIDs[lobbyIndex].players--;
       }
@@ -254,7 +249,6 @@ io.on("connection", (socket) => {
 
       // Update the lobby list
       const lobbyIndex = lobbies[socket.data.room].lobbyNum;
-      console.log(lobbyIndex)
       if (lobbyIndex != -1) {
         lobbiesIDs[lobbyIndex].players--;
       }

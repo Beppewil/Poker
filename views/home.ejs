@@ -24,13 +24,14 @@
     <label for="colorToggle" class="toggle-label"></label>
   </div>
 
-  <!-- Button to go back from the create game form -->
-  <button id="createGameBackButton"><</button>
+  
   <!-- Button to show the create game form -->
   <button id="createGame">Create Game</button>
   <!-- Form to create a new game lobby -->
   <form action="/createLobby" method="post" id="createGameForm" class="">
     <br><br>
+    <!-- Button to go back from the create game form -->
+    <button type="button"  id="createGameBackButton"><</button>
     <div class="inputLabel">Game Name:</div><br><br>
     <input type="text" id="gameName" size="20" name="gameName" placeholder="Enter Game Name" class="formText"><br><br><br><br><br>
     <div class="inputLabel">Small Blind Value:</div><br><br>
@@ -166,7 +167,7 @@
     // Handle join attempt responses from the server
     socket.on('joinAttempt', (lobbyID) => {
       if (lobbyID != null) {
-        window.location.href += lobbyID; // Redirect to the lobby if successful
+        window.location.href += `/poker/${lobbyID}`; // Redirect to the lobby if successful
       } else {
         alert("Incorrect Password"); // Alert if the password is incorrect
       }

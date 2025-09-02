@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width">
     <title>Poker</title>
     <link href="/views/style.css" rel="stylesheet" type="text/css" />
-
 </head>
 
 <body>
@@ -20,7 +19,8 @@
     <div class="menu">
         <div id="menuBtnWrapper">
           <button class="menuBTN" id="menuBTN">Menu</button>
-          <img src="./Images/black-triangle.png" id="black-triangle">
+          <!-- Changed from relative to absolute path -->
+          <img src="/views/Images/black-triangle.png" id="black-triangle">
         </div>
         <div class="wrapper" id="wrapper">
             <div class="content">
@@ -30,8 +30,8 @@
                 </form>
             </div>
         </div>
-        <!-- Chat button -->
-        <img id="chat-btn" src="./Images/chat.png" draggable="false">
+        <!-- Chat button - Changed from relative to absolute path -->
+        <img id="chat-btn" src="/views/Images/chat.png" draggable="false">
 
         <!-- Chat window -->
         <div id="chat-window">
@@ -45,10 +45,11 @@
         </div>
         </div>
 
+        <button id="startVoiceBtn">Enable Audio</button>
         <button id="mute">Unmute</button>
         <button id="deafenBTN">Undeafen</button>
 
-        <button id="playerOptions">Player Options</button> <!-- Player Options (kick/promote to leader/ BAN)-->
+        <button id="playerOptions">Kick Player</button> <!-- Player Options (kick/promote to leader/ BAN)-->
         
         <button id="player1options" class="playerOptionsBTN"></button>
         <button id="player2options" class="playerOptionsBTN"></button>
@@ -74,8 +75,9 @@
 
 
         <div id="cheatSheet">
-          <button id="cheatSheetButton"><img src="views\Images\Semi-circle Icon.png" style="width: 4vh;"/></button>
-          <img id="cheatSheetImg" src="views\Images\PokerHandsCheatSheet.jpeg" style="width: 40vh;"/>
+          <!-- Changed from relative to absolute path -->
+          <button id="cheatSheetButton"><img src="/views/Images/Semi-circle Icon.png" style="width: 4vh;"/></button>
+          <img id="cheatSheetImg" src="/views/Images/PokerHandsCheatSheet.jpeg" style="width: 40vh;"/>
         </div>
 
         <div id="communityCards">
@@ -258,12 +260,13 @@
 
     </div>
 
-    <script src="./script.js" type="module"></script>
-    <script src="./menuActions.js" type="module"></script>
-    <script src="./playerActions.js" type="module"></script>
+    <!-- Changed from relative to absolute paths -->
+    <script src="/views/script.js" type="module"></script>
+    <script src="/views/menuActions.js" type="module"></script>
+    <script src="/views/playerActions.js" type="module"></script>
 
     <script type="module" >
-        import { socket } from './socket.js'
+        import { socket } from '/views/socket.js'
         socket.emit('joinRoom', '<%= room %>');
     </script>
 

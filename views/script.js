@@ -1,5 +1,5 @@
 // Import the socket connection from the socket.js file
-import { socket } from './socket.js';
+import { socket } from '/views/socket.js';
 
 // Define an object that maps card values and suits to their corresponding names
 const cardValuesW = {
@@ -40,7 +40,7 @@ function HTMLCardDisplay(Cards, handName) {
       // Get the image element by its ID (e.g., 'player1', 'player2')
       let image = document.getElementById(`${handName}${i + 1}`);
       // Set the image source to the card back image
-      image.src = `views/Images/Playing Cards/PNG-cards-1.3/cardBack.png`;
+      image.src = `/views/Images/Playing Cards/PNG-cards-1.3/cardBack.png`;
     }
   } else {
     // If Cards is an array, display the actual cards
@@ -48,7 +48,7 @@ function HTMLCardDisplay(Cards, handName) {
       // Get the image element by its ID (e.g., 'player1', 'player2')
       let image = document.getElementById(`${handName}${i + 1}`);
       // Set the image source to the corresponding card image using the cardValuesW mapping
-      image.src = `./Images/Playing Cards/PNG-cards-1.3/${cardValuesW[Cards[i].v]}_of_${cardValuesW[Cards[i].s]}.png`;
+      image.src = `/views/Images/Playing Cards/PNG-cards-1.3/${cardValuesW[Cards[i].v]}_of_${cardValuesW[Cards[i].s]}.png`;
       // Add the 'active' class to the image (for styling or interaction purposes)
       image.classList.add("active");
     }

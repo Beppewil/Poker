@@ -11,8 +11,8 @@ var gameTimer = document.getElementById('gameTimer'); // Game timer display
 var muteBTN = document.getElementById('mute') // Voice Chat mute button
 const deafenBTN = document.getElementById('deafenBTN');
 
-// Import the socket connection
-import { socket } from './socket.js';
+// Import the socket connection - Changed to absolute path
+import { socket } from '/views/socket.js';
 
 // WebRTC Voice Chat Variables
 let localStream;
@@ -198,7 +198,7 @@ socket.on('leaveRoom', (msg) => {
   window.location.href = '/'; // Redirect to the home page
 });
 
-// WebRTC Voice Chat Functions
+// WebRTC Voice Chat Functions - Mobile Compatible
 let remoteAudioElements = {}; // Store remote audio elements
 let isDeafened = true;
 
@@ -206,112 +206,215 @@ function createPeer(id) {
   const peer = new RTCPeerConnection({
     iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
   });
-  
+ 
   peer.onicecandidate = event => {
     if (event.candidate) {
       socket.emit("ice-candidate", id, event.candidate);
     }
   };
-  
+ 
   peer.ontrack = event => {
-    const remoteAudio = new Audio();
+    console.log('Received remote track from:', id);
+    
+    // Create audio element and add to DOM
+    const remoteAudio = document.createElement('audio');
+    remoteAudio.id = `remote-audio-${id}`;
     remoteAudio.srcObject = event.streams[0];
     remoteAudio.autoplay = true;
-    remoteAudio.muted = isDeafened; // Apply current deafen state
+    remoteAudio.playsInline = true; // Important for iOS
+    remoteAudio.muted = isDeafened;
+    
+    // Add to DOM (hidden)
+    remoteAudio.style.display = 'none';
+    document.body.appendChild(remoteAudio);
     
     // Store the audio element for this peer
     remoteAudioElements[id] = remoteAudio;
+    
+    // Handle mobile autoplay restrictions
+    const playAudio = async () => {
+      try {
+        await remoteAudio.play();
+        console.log('Remote audio playing for:', id);
+      } catch (error) {
+        console.warn('Autoplay failed for remote audio:', error);
+        // On mobile, audio will play after user interaction
+      }
+    };
+    
+    // Try to play immediately
+    playAudio();
+    
+    // Also try to play on next user interaction
+    const enableAudioOnInteraction = () => {
+      playAudio();
+      document.removeEventListener('touchstart', enableAudioOnInteraction);
+      document.removeEventListener('click', enableAudioOnInteraction);
+    };
+    
+    document.addEventListener('touchstart', enableAudioOnInteraction, { once: true });
+    document.addEventListener('click', enableAudioOnInteraction, { once: true });
   };
-  
+ 
   peer.onnegotiationneeded = async () => {
-    const offer = await peer.createOffer();
-    await peer.setLocalDescription(offer);
-    socket.emit("offer", id, peer.localDescription);
+    try {
+      const offer = await peer.createOffer();
+      await peer.setLocalDescription(offer);
+      socket.emit("offer", id, peer.localDescription);
+    } catch (error) {
+      console.error('Error creating offer:', error);
+    }
   };
-  
+ 
   return peer;
 }
 
 // WebRTC Socket Events
 socket.on('connect', () => {
-  // Initialize WebRTC voice chat when connected
-  navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+  console.log('Socket connected, initializing WebRTC...');
+  
+  // Request audio with mobile-optimized constraints
+  const audioConstraints = {
+    audio: {
+      echoCancellation: true,
+      noiseSuppression: true,
+      autoGainControl: true,
+      // Mobile-specific optimizations
+      sampleRate: 16000,
+      channelCount: 1
+    }, 
+    video: false
+  };
+  
+  navigator.mediaDevices.getUserMedia(audioConstraints)
     .then(stream => {
       localStream = stream;
-      
+      console.log('Local audio stream obtained');
+     
       socket.on("new-user", id => {
+        console.log('New user connected:', id);
         const peer = createPeer(id);
         peers[id] = peer;
-        stream.getTracks().forEach(track => peer.addTrack(track, stream));
+        stream.getTracks().forEach(track => {
+          console.log('Adding local track to peer:', id);
+          peer.addTrack(track, stream);
+        });
       });
-      
+     
       socket.on("offer", async (id, offer) => {
-        const peer = createPeer(id);
-        peers[id] = peer;
-        await peer.setRemoteDescription(new RTCSessionDescription(offer));
-        stream.getTracks().forEach(track => peer.addTrack(track, stream));
-        const answer = await peer.createAnswer();
-        await peer.setLocalDescription(answer);
-        socket.emit("answer", id, answer);
-      });
-      
-      socket.on("answer", async (id, answer) => {
-        await peers[id]?.setRemoteDescription(new RTCSessionDescription(answer));
-      });
-      
-      socket.on("ice-candidate", async (id, candidate) => {
-        if (peers[id]) {
-          await peers[id].addIceCandidate(new RTCIceCandidate(candidate));
+        console.log('Received offer from:', id);
+        try {
+          const peer = createPeer(id);
+          peers[id] = peer;
+          await peer.setRemoteDescription(new RTCSessionDescription(offer));
+          stream.getTracks().forEach(track => peer.addTrack(track, stream));
+          const answer = await peer.createAnswer();
+          await peer.setLocalDescription(answer);
+          socket.emit("answer", id, answer);
+          console.log('Sent answer to:', id);
+        } catch (error) {
+          console.error('Error handling offer:', error);
         }
       });
-      
+     
+      socket.on("answer", async (id, answer) => {
+        console.log('Received answer from:', id);
+        try {
+          await peers[id]?.setRemoteDescription(new RTCSessionDescription(answer));
+        } catch (error) {
+          console.error('Error handling answer:', error);
+        }
+      });
+     
+      socket.on("ice-candidate", async (id, candidate) => {
+        console.log('Received ICE candidate from:', id);
+        try {
+          if (peers[id]) {
+            await peers[id].addIceCandidate(new RTCIceCandidate(candidate));
+          }
+        } catch (error) {
+          console.error('Error adding ICE candidate:', error);
+        }
+      });
+     
       socket.on("user-disconnected", id => {
+        console.log('User disconnected:', id);
         if (peers[id]) {
           peers[id].close();
           delete peers[id];
         }
         // Clean up remote audio element
         if (remoteAudioElements[id]) {
+          const audioElement = remoteAudioElements[id];
+          if (audioElement.parentNode) {
+            audioElement.parentNode.removeChild(audioElement);
+          }
           delete remoteAudioElements[id];
         }
       });
     })
     .catch(error => {
       console.error('Error accessing microphone:', error);
+      alert('Microphone access denied. Voice chat will not work.');
     });
 });
 
 // Mute/Unmute functionality
 muteBTN.addEventListener('click', toggleMute);
-
 function toggleMute() {
   if (localStream) {
     isMuted = !isMuted;
-    localStream.getAudioTracks()[0].enabled = !isMuted;
-    console.log(isMuted ? "Muted" : "Unmuted");
-    muteBTN.innerHTML = isMuted ? "Unmute" : "Mute";
+    const audioTrack = localStream.getAudioTracks()[0];
+    if (audioTrack) {
+      audioTrack.enabled = !isMuted;
+      console.log(isMuted ? "Muted" : "Unmuted");
+      muteBTN.innerHTML = isMuted ? "Unmute" : "Mute";
+    }
     return isMuted;
   }
 }
 
 // Deafen/Undeafen functionality
 deafenBTN.addEventListener('click', toggleDeafen);
-
 function toggleDeafen() {
   isDeafened = !isDeafened;
-  isMuted = !isMuted;
   
+  // Don't automatically mute when deafening - let user control separately
+  // isMuted = !isMuted; // Remove this line
+ 
   // Apply deafen state to all current remote audio elements
   Object.values(remoteAudioElements).forEach(audioElement => {
     audioElement.muted = isDeafened;
+    console.log(`Set remote audio muted to: ${isDeafened}`);
   });
-  
+ 
+  console.log('Remote audio elements:', remoteAudioElements);
   console.log(isDeafened ? "Deafened" : "Undeafened");
   deafenBTN.innerHTML = isDeafened ? "Undeafen" : "Deafen";
-  muteBTN.innerHTML = isDeafened ? "Unmute" : "Mute";
+  
   return isDeafened;
+}
+
+// Add this button click handler
+document.getElementById('startVoiceBtn').addEventListener('click', () => {
+  enableAllAudio();
+  // Hide the button after first interaction
+  document.getElementById('startVoiceBtn').style.display = 'none';
+});
+
+// Add a function to manually enable audio (call this on user interaction)
+function enableAllAudio() {
+  Object.values(remoteAudioElements).forEach(async audioElement => {
+    try {
+      await audioElement.play();
+      console.log('Successfully started remote audio playback');
+    } catch (error) {
+      console.warn('Could not start audio playback:', error);
+    }
+  });
 }
 
 // Export functions for global access
 window.toggleMute = toggleMute;
 window.toggleDeafen = toggleDeafen;
+window.enableAllAudio = enableAllAudio;
