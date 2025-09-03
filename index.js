@@ -65,15 +65,25 @@ app.post("/createLobby", function (req, res) {
   LOBBY_ID = uuidV4();
 
   // Add the lobby to the list of available lobbies
-  lobbiesIDs.push({ id: lobbiesIDs.length, name: req.body.gameName, blind: req.body.blindValue, players: 0, private: req.body.privateCheckbox == 'true' })
+  lobbiesIDs.push({ id: lobbiesIDs.length, name: req.body.gameName, blind: req.body.blindValue, players: 0, private: req.body.privateCheckbox == 'true', game_type: req.body.game_type })
   lobbiesNumber.push(LOBBY_ID)
 
   // Create a new PokerGame instance for the lobby
   if (!lobbies[LOBBY_ID]) {
     if (req.body.privateCheckbox == 'true') {
-      lobbies[LOBBY_ID] = new PokerGame(io, LOBBY_ID, Math.floor(Math.abs(req.body.blindValue)), req.body.gamePassword, lobbiesNumber.length - 1);
+      if (req.body.game_type == 'poker') {
+        lobbies[LOBBY_ID] = new PokerGame(io, LOBBY_ID, Math.floor(Math.abs(req.body.blindValue)), req.body.gamePassword, lobbiesNumber.length - 1);
+      }
+      else {
+        lobbies[LOBBY_ID] = new PokerGame(io, LOBBY_ID, req.body.gamePassword, lobbiesNumber.length - 1, false, 3);
+      }
     } else {
-      lobbies[LOBBY_ID] = new PokerGame(io, LOBBY_ID, Math.floor(Math.abs(req.body.blindValue)), null, lobbiesNumber.length - 1);
+       if (req.body.game_type == 'poker') {
+        lobbies[LOBBY_ID] = new PokerGame(io, LOBBY_ID, Math.floor(Math.abs(req.body.blindValue)), null, lobbiesNumber.length - 1);
+      }
+      else {
+        lobbies[LOBBY_ID] = new PokerGame(io, LOBBY_ID, req.body.gamePassword, lobbiesNumber.length - 1, false, 3);
+      }
     }
   }
 
@@ -81,7 +91,7 @@ app.post("/createLobby", function (req, res) {
   io.emit('newButton', lobbiesIDs, req.body.gameName);
 
   // Redirect the user to the lobby page
-  res.redirect(`/poker/${LOBBY_ID}`)
+  res.redirect(`/${req.body.game_type}/${LOBBY_ID}`)
 });
 
 // Handle GET request to a specific poker room
