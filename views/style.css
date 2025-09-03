@@ -972,8 +972,29 @@ audio[id^="remote-audio-"] {
   transform: translate(-50%, -50%);
 }
 
+#poker_radio {
+  left: 50%;
+  transform: translate(-50%, 0%);
+}
+#blackjack_radio {
+  left: 60%;
+  transform: translate(-50%, 0%);
+}
+.radio-group {
+  position: absolute;
+  top: 10%;              /* adjust vertical placement */
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;             /* spacing between options */
+  align-items: center;
+  z-index: 5;
+}
 
-
+.radio-group label {
+  margin-right: 6px;
+  font-size: 18px;
+}
 
 
 
