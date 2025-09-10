@@ -1,6 +1,6 @@
 // Import necessary modules
 import * as script from '/views/script.js'; // Import all functions/objects from script.js
-import { socket } from '/views/socket.js'; // Import the socket connection from socket.js
+import { socket, getCookie, checkCookie, setCookie } from '/views/socket.js'; // Import the socket connection from socket.js
 
 // Event Listeners for game actions
 var call = document.getElementById("call"); // Get the "Call" button
@@ -205,7 +205,11 @@ socket.on('optChoices', (reason) => {
 
 // Socket event: When a new player joins
 socket.on('playerJoin', (msg) => {
-  var username = '';
+  var username = getCookie("username");
+  if (username != "") {
+    socket.emit('usernameEntered', username);
+    return;
+  }
   while (username == '') {
     username = prompt(`${msg} Enter Username: `); // Prompt the player to enter a username
   }

@@ -24,6 +24,9 @@
     <label for="colorToggle" class="toggle-label"></label>
   </div>
 
+  <label for="change-username-button" id="username-label"></label>
+  <button id="change-username-button">CHANGE USERNAME</button>
+
   
   <!-- Button to show the create game form -->
   <button id="createGame">Create Game</button>
@@ -75,13 +78,15 @@
   <script src="/socket.io/socket.io.js" defer></script>
   <!-- Main script for handling interactions -->
   <script type="module" defer>
-    import { socket } from './socket.js';
+    import { socket, setCookie, getCookie, checkCookie } from './socket.js';
 
     // Toggle the create game form
     const createGame = document.getElementById('createGame');
     createGame.addEventListener('click', createGameForm);
     const createGameBackButton = document.getElementById('createGameBackButton');
     createGameBackButton.addEventListener('click', createGameForm);
+
+    const USERNAME_BUTTON = document.getElementById("change-username-button");
 
     function createGameForm() {
       // Toggle visibility of the create game form and back button
@@ -218,6 +223,20 @@
         htmlpage.classList.remove('rainbow'); // Remove rainbow background effect
       }
     });
+
+    if (!checkCookie()) {
+      setUsername()
+    }
+
+    USERNAME_BUTTON.addEventListener("click", setUsername);
+
+    function setUsername(name) {
+      let username = prompt("Enter your username: ", )
+      setCookie("username", username, 1)
+      document.getElementById("username-label").textContent = getCookie("username") || "";
+    }
+    document.getElementById("username-label").textContent = getCookie("username") || "";
+
   </script>
 </body>
 </html>
