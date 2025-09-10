@@ -900,6 +900,7 @@ html {
   position: absolute;
   left: 23.5%;
   top: 12.5%;
+  z-index: 5;
 }
 #createGameBackButton {
   position: absolute;

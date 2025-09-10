@@ -60,8 +60,9 @@
       <% for (let i = 1; i <= lobbiesIDs.length; i++) { %>
         <div class="lobbyList">
           <div style="margin-bottom: 10px;"><b><u><%= lobbiesIDs[i-1].name %>'s Lobby</u></b></div>
+          <div>Game Type: <%= lobbiesIDs[i-1].game_type%></div>
           <div>Small Blind: <%= lobbiesIDs[i-1].blind %></div>
-          <div id="PlayerCount">Players: <%= lobbiesIDs[i-1].players %>/8</div>
+          <div id="PlayerCount">Players: <%= lobbiesIDs[i-1].players %>/<%= lobbiesIDs[i-1].game_type == "poker" ? 8 : 3 %> </div>
           <div id="joinPrivate" value="<%=lobbiesIDs[i-1].private %>">Private: <%= lobbiesIDs[i-1].private %></div>
           <input type="hidden" name="lobbyId_<%=lobbiesIDs[i-1].id%>" value="<%=lobbiesIDs[i-1].id%>">
           <button type="submit" name="joinLobby_<%=lobbiesIDs[i-1].id%>" id="joinLobby" value="<%=lobbiesIDs[i-1].id%>" class="joinButton">Join Lobby</button>

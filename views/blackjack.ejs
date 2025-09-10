@@ -16,7 +16,6 @@
     <div class="menu">
         <div id="menuBtnWrapper">
           <button class="menuBTN" id="menuBTN">Menu</button>
-          <!-- Changed from relative to absolute path -->
           <img src="/views/Images/black-triangle.png" id="black-triangle">
         </div>
         <div class="wrapper" id="wrapper">
@@ -27,7 +26,6 @@
                 </form>
             </div>
         </div>
-        <!-- Chat button - Changed from relative to absolute path -->
         <img id="chat-btn" src="/views/Images/chat.png" draggable="false">
 
         <!-- Chat window -->
@@ -65,6 +63,10 @@
 
 
   <script src="blackjackActions.js"></script>
+  <script type="module" >
+    import { socket } from '/views/socket.js'
+    socket.emit('joinRoom', '<%= room %>');
+  </script>
   </div>
 </body>
 </html>
