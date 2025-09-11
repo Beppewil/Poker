@@ -206,13 +206,16 @@ socket.on('optChoices', (reason) => {
 // Socket event: When a new player joins
 socket.on('playerJoin', (msg) => {
   var username = getCookie("username");
-  if (username != "") {
+  console.log(msg)
+  if (username != "" && msg == '') {
     socket.emit('usernameEntered', username);
     return;
   }
-  while (username == '') {
-    username = prompt(`${msg} Enter Username: `); // Prompt the player to enter a username
+  while (username == '' || msg != '') {
+    username = prompt(`${msg} \nEnter Username: `); // Prompt the player to enter a username
+    msg = ''
   }
+  console.log(username)
   socket.emit('usernameEntered', username); // Emit the entered username
 });
 
