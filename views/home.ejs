@@ -27,6 +27,8 @@
   <label for="change-username-button" id="username-label"></label>
   <button id="change-username-button">CHANGE USERNAME</button>
 
+  <button id="delete-cookies-button">Turn off cookies</button>
+
   
   <!-- Button to show the create game form -->
   <button id="createGame">Create Game</button>
@@ -78,7 +80,7 @@
   <script src="/socket.io/socket.io.js" defer></script>
   <!-- Main script for handling interactions -->
   <script type="module" defer>
-    import { socket, setCookie, getCookie, checkCookie } from './socket.js';
+    import { socket, setCookie, getCookie, checkCookie, deleteCookie } from './socket.js';
 
     // Toggle the create game form
     const createGame = document.getElementById('createGame');
@@ -236,6 +238,16 @@
       document.getElementById("username-label").textContent = getCookie("username") || "";
     }
     document.getElementById("username-label").textContent = getCookie("username") || "";
+
+    const DELETE_COOKIES = document.getElementById('delete-cookies-button')
+
+    DELETE_COOKIES.addEventListener('click', cookieDeletion)
+
+    function cookieDeletion() {
+      deleteCookie('username');
+      document.getElementById("username-label").textContent = getCookie("username") || "";
+    }
+
 
   </script>
 </body>

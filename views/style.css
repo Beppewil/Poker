@@ -997,6 +997,12 @@ audio[id^="remote-audio-"] {
   font-size: 18px;
 }
 
+#delete-cookies-button {
+  position: absolute;
+  right: 0%;
+  top: 2%;
+  transform: translate(-50%, -50%);
+}
 
 
 

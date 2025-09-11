@@ -202,7 +202,7 @@ class PokerGame {
       this.i = (this.playerTurn.length > 3) ? 2 : 0;
       this.currentBet = this.blindValue * 2; // Set current bet to double the blind
 
-      this.updateArrow(this.playerTurn[this.i]); // Update the arrow to indicate current player
+      this.updateOutline(this.playerTurn[this.i]); // Update the arrow to indicate current player
       this.io.to(this.roomID).emit("newRound"); // Notify all players of the new round
       this.io.to(this.roomID).emit("updateBet", ['', this.blindValue * 2]); // Update bet information
       this.io.to(this.roomID).emit('updatePot', this.pot); // Update pot information
@@ -317,7 +317,7 @@ class PokerGame {
             this.players[player].socket.emit('playerBet', this.players[player].roundBet); // Notify player of their round bet
           }
         }
-        this.updateArrow(this.playerTurn[this.i]); // Update the arrow to indicate current player
+        this.updateOutline(this.playerTurn[this.i]); // Update the arrow to indicate current player
       }
     } catch (error) {
       // Log error if handling player bet fails
@@ -440,6 +440,7 @@ class PokerGame {
       } else {
         // If not enough players, deal remaining community cards
         this.comCards.push(...this.deck.splice(0, 5 - this.comCards.length)); // Deal remaining community cards
+        this.io.to(this.roomID).emit("nextCards", this.comCards);
         this.roundEnd(); // End the round
       }
     } catch (error) {
@@ -571,8 +572,8 @@ roundEnd() {
   }
 }
 
-  // Method to update the arrow indicating the current player's turn
-  updateArrow(i) {
+  // Method to outline indicating the current player's turn
+  updateOutline(i) {
     try {
       for (let player in this.players) {
         this.players[player].socket.emit("moveArrow", i, this.players[player].playerNum); // Notify players of the current turn

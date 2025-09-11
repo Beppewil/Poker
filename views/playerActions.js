@@ -1,6 +1,6 @@
 // Import necessary modules
 import * as script from '/views/script.js'; // Import all functions/objects from script.js
-import { socket, getCookie, checkCookie, setCookie } from '/views/socket.js'; // Import the socket connection from socket.js
+import { socket, getCookie, checkCookie, setCookie, deleteCookie } from '/views/socket.js'; // Import the socket connection from socket.js
 
 // Event Listeners for game actions
 var call = document.getElementById("call"); // Get the "Call" button
