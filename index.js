@@ -103,6 +103,10 @@ app.get('/poker/:room', function (req, res) {
 // Set up socket.io event listeners
 io.on("connection", (socket) => {
 
+  socket.on("getLobbies", () => {
+    socket.emit("lobbiesData", lobbiesIDs);
+  });
+
   // Handle 'joinPrivateLobby' event
   socket.on('joinPrivateLobby', (lobbyNum, password) => {
     // Check if the password is correct

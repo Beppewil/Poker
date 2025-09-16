@@ -4,18 +4,14 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Link to the CSS stylesheet -->
   <link href="/views/style.css" rel="stylesheet" type="text/css" />
   <title>Home</title>
 </head>
 <body>
-  <!-- Declare lobbiesIDs as a global variable -->
   <script>
     var lobbiesIDs = <%- JSON.stringify(lobbiesIDs) %>;
   </script>
 
-
-  <!-- Title of the page -->
   <h1 id="pokerTitle">Poker</h1>
 
   <!-- Toggle switch for background color -->
@@ -26,21 +22,16 @@
 
   <label for="change-username-button" id="username-label"></label>
   <button id="change-username-button">CHANGE USERNAME</button>
-
   <button id="delete-cookies-button">Turn off cookies</button>
 
-  
-  <!-- Button to show the create game form -->
+  <!-- Create Game Button -->
   <button id="createGame">Create Game</button>
-  <!-- Form to create a new game lobby -->
   <form action="/createLobby" method="post" id="createGameForm" class="">
     <br><br>
-    <!-- Button to go back from the create game form -->
-    <button type="button"  id="createGameBackButton"><</button>
+    <button type="button" id="createGameBackButton"><</button>
     <div class="radio-group">
       <label for="poker_radio">Poker</label>
       <input type="radio" id="poker_radio" name="game_type" value="poker" checked>
-
       <label for="blackjack_radio">Blackjack</label>
       <input type="radio" id="blackjack_radio" name="game_type" value="blackjack">
     </div>
@@ -51,204 +42,153 @@
     <input type="number" id="blindValue" size="20" name="blindValue" placeholder="Enter Small Blind Value" class="formText" min="1"><br><br><br>
     <div class="inputLabel">Private Lobby</div><br><br>
     <input type="checkbox" id="privateCheckbox" name="privateCheckbox" value="true"><br>
-    <input type="password" id="passwordInput" class="formText" size="20" name="gamePassword" placeholder="Enter Password"> <br><br><br><br>
+    <input type="password" id="passwordInput" class="formText" size="20" name="gamePassword" placeholder="Enter Password"><br><br><br><br>
     <button type="submit" id="submitForm">Create Game</button>
   </form>
 
-  <!-- Button to join a game -->
+  <!-- Join Game Section -->
   <button class="homeButton" id="joinGame">Join Game</button>
-  <!-- Wrapper for the lobby list form -->
   <div id="lobbyFormWrapper">
     <button id="joinGameBackButton"><</button>
     <form action="/" method="post" id="lobbyForm">
-      <!-- Loop through lobbies and display them -->
-      <% for (let i = 1; i <= lobbiesIDs.length; i++) { %>
-        <div class="lobbyList">
-          <div style="margin-bottom: 10px;"><b><u><%= lobbiesIDs[i-1].name %>'s Lobby</u></b></div>
-          <div>Game Type: <%= lobbiesIDs[i-1].game_type%></div>
-          <div>Small Blind: <%= lobbiesIDs[i-1].blind %></div>
-          <div id="PlayerCount">Players: <%= lobbiesIDs[i-1].players %>/<%= lobbiesIDs[i-1].game_type == "poker" ? 8 : 3 %> </div>
-          <div id="joinPrivate" value="<%=lobbiesIDs[i-1].private %>">Private: <%= lobbiesIDs[i-1].private %></div>
-          <input type="hidden" name="lobbyId_<%=lobbiesIDs[i-1].id%>" value="<%=lobbiesIDs[i-1].id%>">
-          <button type="submit" name="joinLobby_<%=lobbiesIDs[i-1].id%>" id="joinLobby" value="<%=lobbiesIDs[i-1].id%>" class="joinButton">Join Lobby</button>
-        </div>
-      <% } %>
+      <!-- Refresh Button -->
+      <button type="button" id="refreshLobbies">Refresh Lobbies</button>
+      <!-- Lobby List Container -->
+      <div id="lobbyListContainer"></div>
     </form>
   </div>
 
-  <!-- Include Socket.IO client library -->
   <script src="/socket.io/socket.io.js" defer></script>
-  <!-- Main script for handling interactions -->
   <script type="module" defer>
     import { socket, setCookie, getCookie, checkCookie, deleteCookie } from './socket.js';
 
-    // Toggle the create game form
+    // Create Game Toggle
     const createGame = document.getElementById('createGame');
-    createGame.addEventListener('click', createGameForm);
     const createGameBackButton = document.getElementById('createGameBackButton');
+    createGame.addEventListener('click', createGameForm);
     createGameBackButton.addEventListener('click', createGameForm);
 
-    const USERNAME_BUTTON = document.getElementById("change-username-button");
-
     function createGameForm() {
-      // Toggle visibility of the create game form and back button
       document.getElementById('createGameForm').classList.toggle('active');
       createGameBackButton.classList.toggle('active');
     }
 
-    // Toggle password input for private lobbies
+    // Private Lobby Password Toggle
     const privateCheckbox = document.getElementById('privateCheckbox');
     const passwordInput = document.getElementById('passwordInput');
+    privateCheckbox.addEventListener('click', () => passwordInput.classList.toggle("active"));
 
-    privateCheckbox.addEventListener('click', () => {
-      // Show or hide the password input based on the checkbox state
-      passwordInput.classList.toggle("active");
-    });
-
-    // Validate and submit the create game form
-    const gameName = document.getElementById('gameName');
+    // Blind Value Input Restriction
     const blindValue = document.getElementById('blindValue');
-    const submitForm = document.getElementById('submitForm');
-
-    // Restrict input in the blind value field to numbers and navigation keys
     blindValue.addEventListener('keydown', (e) => {
-      if (!e.key.match(/^(\d|Backspace|ArrowLeft|ArrowRight)$/)) {
-        e.preventDefault(); // Prevent invalid input
-      }
+      if (!e.key.match(/^(\d|Backspace|ArrowLeft|ArrowRight)$/)) e.preventDefault();
     });
 
-    // Handle form submission
+    // Create Game Form Submission
+    const gameName = document.getElementById('gameName');
+    const submitForm = document.getElementById('submitForm');
     submitForm.addEventListener('click', (e) => {
-      e.preventDefault(); // Prevent default form submission
+      e.preventDefault();
       if (
-        gameName.value.trim() !== '' && // Check if game name is not empty
-        blindValue.value.trim() !== '' && // Check if blind value is not empty
-        !lobbiesIDs.find(lobby => lobby.name.toLowerCase() === gameName.value.toLowerCase()) // Check if game name is unique
+        gameName.value.trim() !== '' &&
+        blindValue.value.trim() !== '' &&
+        !lobbiesIDs.find(lobby => lobby.name.toLowerCase() === gameName.value.toLowerCase())
       ) {
-        document.getElementById('createGameForm').submit(); // Submit the form if valid
+        document.getElementById('createGameForm').submit();
       } else {
-        // Highlight errors if form is invalid
-        if (gameName.value.trim() == '' || lobbiesIDs.find(lobby => lobby.name.toLowerCase() === gameName.value.toLowerCase())) {
-          gameName.classList.add("notFilled"); // Highlight empty or duplicate game name
-        } else {
-          gameName.classList.remove("notFilled");
-        }
-        if (blindValue.value.trim() == '') {
-          blindValue.classList.add("notFilled"); // Highlight empty blind value
-        } else {
-          blindValue.classList.remove("notFilled");
-        }
-        if (lobbiesIDs.find(lobby => lobby.name.toLowerCase() === gameName.value.toLowerCase())) {
-          alert("Lobby Name Taken"); // Alert if game name is taken
-        }
-      }
+        if (gameName.value.trim() === '' || lobbiesIDs.find(lobby => lobby.name.toLowerCase() === gameName.value.toLowerCase())) {
+          gameName.classList.add("notFilled");
+        } else gameName.classList.remove("notFilled");
+        if (blindValue.value.trim() === '') blindValue.classList.add("notFilled"); else blindValue.classList.remove("notFilled");
+        if (lobbiesIDs.find(lobby => lobby.name.toLowerCase() === gameName.value.toLowerCase())) alert("Lobby  Taken");
+      }Name
     });
 
-    // Handle joining lobbies
-    const joinLobbyButtons = document.querySelectorAll('.joinButton');
-    const lobbyForm = document.getElementById('lobbyForm');
-
+    // Join Game Toggle
     const joinGameButton = document.getElementById('joinGame');
-    joinGameButton.addEventListener('click', joinGameBTN);
     const joinGameBackButton = document.getElementById('joinGameBackButton');
+    joinGameButton.addEventListener('click', joinGameBTN);
     joinGameBackButton.addEventListener('click', joinGameBTN);
-
     function joinGameBTN() {
-      // Toggle visibility of the lobby list form
       document.getElementById('lobbyFormWrapper').classList.toggle('active');
+      socket.emit("getLobbies")
     }
 
-    // Handle click events for join lobby buttons
-    joinLobbyButtons.forEach(button => {
-      button.addEventListener('click', (e) => {
-        e.preventDefault(); // Prevent default form submission
-        const lobbyId = button.value; // Get the lobby ID from the button value
-        const lobby = lobbiesIDs.find(lobby => lobby.id == lobbyId); // Find the corresponding lobby
-        if (lobby.private) {
-          // If the lobby is private, prompt for a password
-          const password = prompt("Enter password for this private lobby:");
-          socket.emit('joinPrivateLobby', lobbyId, password); // Emit event to join private lobby
-        } else {
-          // If the lobby is public, submit the form directly
-          const hiddenInput = document.createElement('input');
-          hiddenInput.type = 'hidden';
-          hiddenInput.name = 'lobbyId';
-          hiddenInput.value = lobbyId;
-          lobbyForm.appendChild(hiddenInput);
-          lobbyForm.submit();
-        }
+    // Render Lobbies
+    const lobbyListContainer = document.getElementById("lobbyListContainer");
+    const refreshButton = document.getElementById("refreshLobbies");
+    const lobbyForm = document.getElementById("lobbyForm");
+
+    function renderLobbies(lobbies) {
+      lobbyListContainer.innerHTML = "";
+      lobbies.forEach(lobby => {
+        const div = document.createElement("div");
+        div.classList.add("lobbyList");
+
+        div.innerHTML = `
+          <div style="margin-bottom:10px;"><b><u>${lobby.name}'s Lobby</u></b></div>
+          <div>Game Type: ${lobby.game_type}</div>
+          <div>Small Blind: ${lobby.blind}</div>
+          <div>Players: ${lobby.players}/${lobby.game_type === "poker" ? 8 : 3}</div>
+          <div>Private: ${lobby.private}</div>
+          <button type="button" class="joinButton" value="${lobby.id}">Join Lobby</button>
+        `;
+
+        div.querySelector(".joinButton").addEventListener("click", () => {
+          if (lobby.private) {
+            const password = prompt("Enter password for this private lobby:");
+            socket.emit("joinPrivateLobby", lobby.id, password);
+          } else {
+            const hiddenInput = document.createElement("input");
+            hiddenInput.type = "hidden";
+            hiddenInput.name = "lobbyId";
+            hiddenInput.value = lobby.id;
+            lobbyForm.appendChild(hiddenInput);
+            lobbyForm.submit();
+          }
+        });
+
+        lobbyListContainer.appendChild(div);
       });
-    });
+    }
 
-    // Handle join attempt responses from the server
-    socket.on('joinAttempt', (lobbyID) => {
-      if (lobbyID != null) {
-        window.location.href += `/poker/${lobbyID}`; // Redirect to the lobby if successful
-      } else {
-        alert("Incorrect Password"); // Alert if the password is incorrect
-      }
-    });
+    // Initial render
+    renderLobbies(lobbiesIDs);
 
-    // Add a new lobby button dynamically when a new lobby is created
-    socket.on('newButton', (lobbies, lobbyName) => {
-      const newButton = document.createElement('div');
-      newButton.classList.add('lobbyList');
-      const nameDiv = document.createElement('div');
-      nameDiv.style.marginBottom = '10px';
-      nameDiv.innerHTML = `<b><u>${lobbyName}'s Lobby</u></b>`; // Display the lobby name
-      newButton.appendChild(nameDiv);
-      const blindDiv = document.createElement('div');
-      blindDiv.textContent = `Small Blind: ${lobbies[lobbies.length].blind}`; // Display the small blind value
-      newButton.appendChild(blindDiv);
-      const playersDiv = document.createElement('div');
-      playersDiv.textContent = `Players: ${lobbies[lobbies.length].players}/8`; // Display the player count
-      newButton.appendChild(playersDiv);
-      const joinButton = document.createElement('button');
-      joinButton.type = 'submit';
-      joinButton.name = 'lobby';
-      joinButton.value = `${lobbies.length}`;
-      joinButton.textContent = 'Join Lobby';
-      joinButton.classList.add('joinButton');
-      newButton.appendChild(joinButton);
-      document.getElementById('lobbyForm').appendChild(newButton); // Add the new lobby to the form
-    });
+    // Refresh Button
+    refreshButton.addEventListener("click", () => socket.emit("getLobbies"));
+    
+    socket.on("lobbiesData", (lobbies) => renderLobbies(lobbies));
 
-    // Toggle background color between gray and rainbow
+    // Background Toggle
     const colorToggle = document.getElementById('colorToggle');
     const htmlpage = document.getElementById('htmlpage');
     colorToggle.addEventListener('change', () => {
       if (colorToggle.checked) {
-        htmlpage.style.backgroundColor = ''; // Clear background color
-        htmlpage.classList.add('rainbow'); // Add rainbow background effect
+        htmlpage.style.backgroundColor = '';
+        htmlpage.classList.add('rainbow');
       } else {
-        htmlpage.style.backgroundColor = 'gray'; // Set background to gray
-        htmlpage.classList.remove('rainbow'); // Remove rainbow background effect
+        htmlpage.style.backgroundColor = 'gray';
+        htmlpage.classList.remove('rainbow');
       }
     });
 
-    if (!checkCookie()) {
-      setUsername()
-    }
-
+    // Username Handling
+    const USERNAME_BUTTON = document.getElementById("change-username-button");
+    if (!checkCookie()) setUsername();
     USERNAME_BUTTON.addEventListener("click", setUsername);
-
-    function setUsername(name) {
-      let username = prompt("Enter your username: ", )
-      setCookie("username", username, 1)
+    function setUsername() {
+      let username = prompt("Enter your username:");
+      setCookie("username", username, 1);
       document.getElementById("username-label").textContent = getCookie("username") || "";
     }
     document.getElementById("username-label").textContent = getCookie("username") || "";
 
-    const DELETE_COOKIES = document.getElementById('delete-cookies-button')
-
-    DELETE_COOKIES.addEventListener('click', cookieDeletion)
-
-    function cookieDeletion() {
+    // Delete Cookies
+    document.getElementById('delete-cookies-button').addEventListener('click', () => {
       deleteCookie('username');
       document.getElementById("username-label").textContent = getCookie("username") || "";
-    }
-
-
+    });
   </script>
 </body>
 </html>

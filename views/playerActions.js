@@ -67,7 +67,7 @@ function _call() {
 
 // Function to handle the "Raise" action
 function _raise() {
-  let raiseAmount = parseInt(prompt("Raise Amount:")); // Prompt user for raise amount
+  let raiseAmount = parseInt(prompt("What are you raising to \nThis will be added to the current bet:")); // Prompt user for raise amount
   if (raiseAmount == null || isNaN(raiseAmount)) { raiseAmount = 0; } // Default to 0 if invalid input
   socket.emit('playerBet', ['raise', raiseAmount]); // Emit 'playerBet' event with 'raise' and the raise amount
 }
